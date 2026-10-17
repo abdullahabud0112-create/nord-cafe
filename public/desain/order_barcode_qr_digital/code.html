@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<title>NORD CAFE - Order Barcode</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-dim": "#dbdad9",
+                    "on-secondary": "#ffffff",
+                    "surface-bright": "#fbf9f8",
+                    "on-secondary-container": "#6f2e00",
+                    "secondary": "#99460d",
+                    "tertiary-fixed": "#e6e2df",
+                    "status-unpaid": "#6B6B6B",
+                    "secondary-fixed-dim": "#ffb68f",
+                    "on-tertiary-fixed-variant": "#484645",
+                    "surface-variant": "#e4e2e2",
+                    "status-completed": "#10B981",
+                    "on-secondary-fixed-variant": "#773200",
+                    "background-warm": "#F5EBDD",
+                    "inverse-primary": "#c8c6c5",
+                    "error-container": "#ffdad6",
+                    "tertiary-fixed-dim": "#cac6c4",
+                    "on-tertiary-container": "#868382",
+                    "outline": "#747878",
+                    "surface-container-high": "#e9e8e7",
+                    "on-error-container": "#93000a",
+                    "on-surface": "#1b1c1c",
+                    "surface-container-low": "#f5f3f3",
+                    "surface-container-lowest": "#ffffff",
+                    "on-primary": "#ffffff",
+                    "inverse-on-surface": "#f2f0f0",
+                    "status-processing": "#F59E0B",
+                    "error": "#ba1a1a",
+                    "on-background": "#1b1c1c",
+                    "surface": "#fbf9f8",
+                    "background": "#fbf9f8",
+                    "on-error": "#ffffff",
+                    "outline-variant": "#c4c7c7",
+                    "tertiary": "#000000",
+                    "on-primary-fixed-variant": "#474746",
+                    "primary-fixed-dim": "#c8c6c5",
+                    "surface-tint": "#5f5e5e",
+                    "secondary-fixed": "#ffdbca",
+                    "primary": "#000000",
+                    "surface-container-highest": "#e4e2e2",
+                    "on-tertiary": "#ffffff",
+                    "secondary-container": "#fd9356",
+                    "primary-fixed": "#e5e2e1",
+                    "on-tertiary-fixed": "#1c1b1a",
+                    "on-primary-container": "#858383",
+                    "surface-container": "#efeded",
+                    "primary-container": "#1c1b1b",
+                    "on-surface-variant": "#444748",
+                    "tertiary-container": "#1c1b1a",
+                    "on-primary-fixed": "#1c1b1b",
+                    "on-secondary-fixed": "#331100",
+                    "inverse-surface": "#303031"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "unit-xl": "40px",
+                    "gutter": "16px",
+                    "margin-mobile": "20px",
+                    "unit-sm": "8px",
+                    "unit-xs": "4px",
+                    "unit-lg": "24px",
+                    "unit-md": "16px"
+            },
+            "fontFamily": {
+                    "headline-lg": [
+                            "Inter"
+                    ],
+                    "body-lg": [
+                            "Inter"
+                    ],
+                    "label-caps": [
+                            "Inter"
+                    ],
+                    "body-secondary": [
+                            "Inter"
+                    ],
+                    "headline-sm": [
+                            "Inter"
+                    ],
+                    "body-md": [
+                            "Inter"
+                    ],
+                    "headline-md": [
+                            "Inter"
+                    ]
+            },
+            "fontSize": {
+                    "headline-lg": [
+                            "32px",
+                            {
+                                    "lineHeight": "1.2",
+                                    "letterSpacing": "-0.02em",
+                                    "fontWeight": "700"
+                            }
+                    ],
+                    "body-lg": [
+                            "16px",
+                            {
+                                    "lineHeight": "1.6",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "label-caps": [
+                            "12px",
+                            {
+                                    "lineHeight": "1",
+                                    "letterSpacing": "0.05em",
+                                    "fontWeight": "600"
+                            }
+                    ],
+                    "body-secondary": [
+                            "14px",
+                            {
+                                    "lineHeight": "1.6",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "headline-sm": [
+                            "20px",
+                            {
+                                    "lineHeight": "1.4",
+                                    "fontWeight": "600"
+                            }
+                    ],
+                    "body-md": [
+                            "14px",
+                            {
+                                    "lineHeight": "1.6",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "headline-md": [
+                            "24px",
+                            {
+                                    "lineHeight": "1.3",
+                                    "fontWeight": "700"
+                            }
+                    }
+            }
+          },
+        }
+    </script>
+<style>
+        body {
+            background-color: #F5EBDD;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        .qr-card-shadow {
+            box-shadow: 0px 8px 24px rgba(26, 26, 26, 0.08);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="antialiased min-h-screen flex flex-col items-center">
+<div class="w-full max-w-[390px] h-[844px] bg-background-warm relative flex flex-col overflow-hidden mx-auto shadow-2xl md:my-8 rounded-[32px] md:rounded-[40px] border-[8px] border-surface-container-lowest">
+<!-- TopAppBar -->
+<header class="bg-surface-container-lowest/0 text-primary flex justify-between items-center w-full px-margin-mobile h-16 max-w-7xl mx-auto top-0 z-50">
+<button aria-label="Go back" class="flex items-center justify-center p-2 -ml-2 rounded-full hover:bg-surface-variant/20 transition-colors">
+<span class="material-symbols-outlined font-bold text-primary" data-icon="arrow_back">arrow_back</span>
+</button>
+<h1 class="text-headline-sm font-headline-sm font-bold text-primary tracking-wide">NORD CAFE</h1>
+<button class="flex items-center justify-center p-1 rounded-full hover:bg-surface-variant/20 transition-colors">
+<span class="material-symbols-outlined text-primary text-[28px]" data-icon="account_circle">account_circle</span>
+</button>
+</header>
+<!-- Main Content -->
+<main class="flex-1 flex flex-col items-center justify-center px-margin-mobile py-unit-xl pb-32 overflow-y-auto">
+<div class="flex flex-col items-center w-full max-w-[320px] animate-fade-in-up">
+<!-- Status Badge -->
+<div class="bg-[#C1642B] text-on-primary px-5 py-2.5 rounded-full mb-8 shadow-sm">
+<span class="text-label-caps font-label-caps tracking-wider">Menunggu Verifikasi Kasir</span>
+</div>
+<!-- QR Code Card -->
+<div class="bg-surface-container-lowest rounded-[16px] p-6 w-[70%] aspect-square qr-card-shadow flex flex-col items-center justify-center mb-6 mx-auto">
+<svg class="w-full h-full" fill="none" viewbox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+<rect fill="white" height="100" width="100"></rect>
+<path d="M10 10H40V40H10V10ZM15 15V35H35V15H15Z" fill="#1A1A1A"></path>
+<path d="M20 20H30V30H20V20Z" fill="#1A1A1A"></path>
+<path d="M60 10H90V40H60V10ZM65 15V35H85V15H65Z" fill="#1A1A1A"></path>
+<path d="M70 20H80V30H70V20Z" fill="#1A1A1A"></path>
+<path d="M10 60H40V90H10V60ZM15 65V85H35V65H15Z" fill="#1A1A1A"></path>
+<path d="M20 70H30V80H20V70Z" fill="#1A1A1A"></path>
+<rect fill="#1A1A1A" height="10" width="10" x="50" y="50"></rect>
+<rect fill="#1A1A1A" height="10" width="20" x="70" y="50"></rect>
+<rect fill="#1A1A1A" height="20" width="20" x="50" y="70"></rect>
+<rect fill="#1A1A1A" height="20" width="10" x="80" y="70"></rect>
+<rect fill="#1A1A1A" height="10" width="15" x="25" y="45"></rect>
+<rect fill="#1A1A1A" height="20" width="10" x="45" y="25"></rect>
+<rect fill="#1A1A1A" height="10" width="10" x="45" y="10"></rect>
+<rect fill="#1A1A1A" height="5" width="5" x="85" y="45"></rect>
+<rect fill="#1A1A1A" height="10" width="10" x="10" y="45"></rect>
+<rect fill="#1A1A1A" height="10" width="5" x="45" y="80"></rect>
+</svg>
+</div>
+<!-- Order Code -->
+<p class="font-mono text-status-unpaid tracking-widest text-body-lg font-medium mb-8">ORD-240815-012</p>
+<!-- Instruction Text -->
+<p class="text-center text-status-unpaid text-body-md font-body-md px-6 leading-relaxed">
+                    Tunjukkan barcode ini ke kasir untuk konfirmasi pembayaran dan mulai diproses.
+                </p>
+</div>
+</main>
+<!-- BottomNavBar is deliberately omitted as this is a linear/transactional screen focused on order status/barcode presentation -->
+</div>
+<style>
+        .animate-fade-in-up {
+            animation: fadeInUp 0.5s ease-out forwards;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</body></html>

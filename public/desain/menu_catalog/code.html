@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+
+<html lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>NORD CAFE - Katalog Menu</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "surface-dim": "#dbdad9",
+                      "on-secondary": "#ffffff",
+                      "surface-bright": "#fbf9f8",
+                      "on-secondary-container": "#6f2e00",
+                      "secondary": "#99460d",
+                      "tertiary-fixed": "#e6e2df",
+                      "status-unpaid": "#6B6B6B",
+                      "secondary-fixed-dim": "#ffb68f",
+                      "on-tertiary-fixed-variant": "#484645",
+                      "surface-variant": "#e4e2e2",
+                      "status-completed": "#10B981",
+                      "on-secondary-fixed-variant": "#773200",
+                      "background-warm": "#F5EBDD",
+                      "inverse-primary": "#c8c6c5",
+                      "error-container": "#ffdad6",
+                      "tertiary-fixed-dim": "#cac6c4",
+                      "on-tertiary-container": "#868382",
+                      "outline": "#747878",
+                      "surface-container-high": "#e9e8e7",
+                      "on-error-container": "#93000a",
+                      "on-surface": "#1b1c1c",
+                      "surface-container-low": "#f5f3f3",
+                      "surface-container-lowest": "#ffffff",
+                      "on-primary": "#ffffff",
+                      "inverse-on-surface": "#f2f0f0",
+                      "status-processing": "#F59E0B",
+                      "error": "#ba1a1a",
+                      "on-background": "#1b1c1c",
+                      "surface": "#fbf9f8",
+                      "background": "#fbf9f8",
+                      "on-error": "#ffffff",
+                      "outline-variant": "#c4c7c7",
+                      "tertiary": "#000000",
+                      "on-primary-fixed-variant": "#474746",
+                      "primary-fixed-dim": "#c8c6c5",
+                      "surface-tint": "#5f5e5e",
+                      "secondary-fixed": "#ffdbca",
+                      "primary": "#000000",
+                      "surface-container-highest": "#e4e2e2",
+                      "on-tertiary": "#ffffff",
+                      "secondary-container": "#fd9356",
+                      "primary-fixed": "#e5e2e1",
+                      "on-tertiary-fixed": "#1c1b1a",
+                      "on-primary-container": "#858383",
+                      "surface-container": "#efeded",
+                      "primary-container": "#1c1b1b",
+                      "on-surface-variant": "#444748",
+                      "tertiary-container": "#1c1b1a",
+                      "on-primary-fixed": "#1c1b1b",
+                      "on-secondary-fixed": "#331100",
+                      "inverse-surface": "#303031"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "unit-xl": "40px",
+                      "gutter": "16px",
+                      "margin-mobile": "20px",
+                      "unit-sm": "8px",
+                      "unit-xs": "4px",
+                      "unit-lg": "24px",
+                      "unit-md": "16px"
+              },
+              "fontFamily": {
+                      "headline-lg": [
+                              "Inter"
+                      ],
+                      "body-lg": [
+                              "Inter"
+                      ],
+                      "label-caps": [
+                              "Inter"
+                      ],
+                      "body-secondary": [
+                              "Inter"
+                      ],
+                      "headline-sm": [
+                              "Inter"
+                      ],
+                      "body-md": [
+                              "Inter"
+                      ],
+                      "headline-md": [
+                              "Inter"
+                      ]
+              },
+              "fontSize": {
+                      "headline-lg": [
+                              "32px",
+                              {
+                                      "lineHeight": "1.2",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "body-lg": [
+                              "16px",
+                              {
+                                      "lineHeight": "1.6",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "label-caps": [
+                              "12px",
+                              {
+                                      "lineHeight": "1",
+                                      "letterSpacing": "0.05em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "body-secondary": [
+                              "14px",
+                              {
+                                      "lineHeight": "1.6",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-sm": [
+                              "20px",
+                              {
+                                      "lineHeight": "1.4",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "body-md": [
+                              "14px",
+                              {
+                                      "lineHeight": "1.6",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-md": [
+                              "24px",
+                              {
+                                      "lineHeight": "1.3",
+                                      "fontWeight": "700"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+      </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-warm font-body-md text-on-surface antialiased pb-24">
+<!-- TopAppBar -->
+<header class="fixed top-0 left-0 right-0 z-40 bg-surface-container-lowest shadow-[0px_4px_12px_rgba(26,26,26,0.05)] w-full">
+<div class="flex justify-between items-center w-full px-margin-mobile h-16 max-w-7xl mx-auto">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-2xl" data-icon="local_cafe">local_cafe</span>
+<h1 class="text-headline-md font-headline-md font-bold text-on-surface">NORD CAFE</h1>
+</div>
+<div class="w-8 h-8 rounded-full overflow-hidden bg-surface-variant flex items-center justify-center cursor-pointer hover:opacity-80 transition-opacity">
+<img alt="User profile photo" class="w-full h-full object-cover" data-alt="A close up, well lit portrait of a young professional customer in a modern cafe setting. Soft natural lighting, shallow depth of field. High quality, realistic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBhMf_LNI5YTpgBrOocztTArGXZp4ZZwPA28fFdAeP34P-RwaQzXy0VmMIb6xQpEuUEY06B2lZ8Czv86FaD6cDPWI20J00atzqqhozWMOW_fNhQ8zXO7UnbUDoMyL1XrRiZj0wsmyGKqGprYyLtBD0sMbcVfdBJAXIHWZhwTKr1jhoAJge073bmXZKeBy2-x-L9xSUx6LbvnKRDMZLBCgYo0_HfreRlWo8O-MtSZzm9zZoNwY_aUyin"/>
+</div>
+</div>
+</header>
+<!-- Main Content -->
+<main class="pt-24 px-margin-mobile max-w-7xl mx-auto">
+<!-- Page Header -->
+<div class="mb-unit-md">
+<h2 class="text-headline-lg font-headline-lg font-bold text-on-surface">Katalog Menu</h2>
+<p class="text-body-secondary font-body-secondary text-status-unpaid mt-unit-xs">Pilih menu favoritmu</p>
+</div>
+<!-- Filter Pills -->
+<div class="flex gap-unit-sm overflow-x-auto pb-2 mb-unit-lg scrollbar-hide -mx-margin-mobile px-margin-mobile">
+<button class="whitespace-nowrap px-4 py-2 rounded-full bg-primary text-on-primary text-body-md font-body-md font-semibold shrink-0">Semua</button>
+<button class="whitespace-nowrap px-4 py-2 rounded-full bg-transparent border border-outline/20 text-on-surface-variant text-body-md font-body-md hover:bg-surface-variant/20 transition-colors shrink-0">Kopi</button>
+<button class="whitespace-nowrap px-4 py-2 rounded-full bg-transparent border border-outline/20 text-on-surface-variant text-body-md font-body-md hover:bg-surface-variant/20 transition-colors shrink-0">Non-kopi</button>
+<button class="whitespace-nowrap px-4 py-2 rounded-full bg-transparent border border-outline/20 text-on-surface-variant text-body-md font-body-md hover:bg-surface-variant/20 transition-colors shrink-0">Makanan</button>
+</div>
+<!-- Product Grid -->
+<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-gutter pb-unit-xl">
+<!-- Card 1 -->
+<div class="bg-surface-container-lowest rounded-[16px] shadow-[0px_4px_12px_rgba(26,26,26,0.05)] overflow-hidden flex flex-col">
+<div class="aspect-square relative overflow-hidden bg-surface-variant">
+<img alt="Kopi Susu Gula Aren" class="w-full h-full object-cover" data-alt="A refreshing glass of iced Kopi Susu Gula Aren on a clean, light cafe table. Dark espresso layered over milk and thick brown palm sugar syrup. Condensation on the glass. Professional food photography, natural bright lighting, shallow depth of field." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAauZ2sf6gJ31ABPgj3ZcUjD8Y3YkVAS_UF4ymZ7xKLLRit8OxfW4RpaMyDF_oqUBJ6OaF4b5SJfLDGvh_-MdTa4olo7OBaVK26lNeowKHyBasOwINgB8FhyEr_nm1ZOw9Zaf7nLmRT78ZUvU3qmqVng14w_s5kSRrlVozVRw83b-BqEPw3wqRW9ryay6gJYy9hCK83sy5xnRWNpPs2VXkZI_Kb143KLKI0GdyJKnKp-IvbPEqe5z29"/>
+</div>
+<div class="p-unit-sm flex flex-col flex-1 justify-between gap-unit-sm">
+<div>
+<h3 class="text-body-lg font-body-lg font-bold leading-tight line-clamp-2">Kopi Susu Gula Aren</h3>
+<p class="text-headline-sm font-headline-sm text-primary mt-1">Rp18.000</p>
+</div>
+<button class="w-full py-2 bg-primary text-on-primary rounded-lg text-label-caps font-label-caps flex items-center justify-center gap-1 hover:opacity-90 transition-opacity active:scale-95">
+<span class="material-symbols-outlined text-[16px]" data-icon="add">add</span> Tambah
+                    </button>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="bg-surface-container-lowest rounded-[16px] shadow-[0px_4px_12px_rgba(26,26,26,0.05)] overflow-hidden flex flex-col">
+<div class="aspect-square relative overflow-hidden bg-surface-variant">
+<img alt="Americano" class="w-full h-full object-cover" data-alt="A steaming cup of black Americano coffee in a minimalist white ceramic mug on a light wood table. Rich dark crema on top. Professional cafe lifestyle photography, bright morning light, clean aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBWmyCO-G7su512_ttku6CxcLmFS1LM6GAqHrTY1BimyjJIcloiq3ZgICuCukQd8xgkgwtjf6VAaPoakRd_yBXNlPVZadX7Bkvo6pWucxgGDkcOm0X221SBmJ5pbLG5MOFWwbSTvZUHCeW7k8h7YzZvu669PeQHuhmyFKFP2cUiFpNc2aWDX0BCEo0MPbNgf4pG_rZ3h38Z_8tN4hS9zCd9cqNlwWF7CkTle2YdmCX7VCvSwuZvSRTN"/>
+</div>
+<div class="p-unit-sm flex flex-col flex-1 justify-between gap-unit-sm">
+<div>
+<h3 class="text-body-lg font-body-lg font-bold leading-tight line-clamp-2">Americano</h3>
+<p class="text-headline-sm font-headline-sm text-primary mt-1">Rp15.000</p>
+</div>
+<button class="w-full py-2 bg-primary text-on-primary rounded-lg text-label-caps font-label-caps flex items-center justify-center gap-1 hover:opacity-90 transition-opacity active:scale-95">
+<span class="material-symbols-outlined text-[16px]" data-icon="add">add</span> Tambah
+                    </button>
+</div>
+</div>
+<!-- Card 3 -->
+<div class="bg-surface-container-lowest rounded-[16px] shadow-[0px_4px_12px_rgba(26,26,26,0.05)] overflow-hidden flex flex-col">
+<div class="aspect-square relative overflow-hidden bg-surface-variant">
+<img alt="Matcha Latte" class="w-full h-full object-cover" data-alt="A beautifully poured hot Matcha Latte with intricate latte art in a wide shallow cup. Vibrant green color contrasting with white milk foam. Clean, modern cafe table setting, soft diffused daylight. High-end food photography." src="https://lh3.googleusercontent.com/aida-public/AB6AXuABNY1gr5PgvsgJiuxJGNHiQMcRnAq0CEfDJTtwiM0fkFhZ5lKklsvRP-S2CrAm6zifqG0gpTDX6V9mFLXmYqZYhZ04LHRxFIJxkkHAK-9fF_VShpaqb8abF4oZnaWzpLAyc7Y6e45SWfzowtBGuoYsg5SdRX_oljWp7mte5lbsgPNDTnylMIfZSTX9sihlam1ARMLV8QgNGsKrhM709kj3iaglEQRNPejet93d7M35DdGK-PvCURXL"/>
+</div>
+<div class="p-unit-sm flex flex-col flex-1 justify-between gap-unit-sm">
+<div>
+<h3 class="text-body-lg font-body-lg font-bold leading-tight line-clamp-2">Matcha Latte</h3>
+<p class="text-headline-sm font-headline-sm text-primary mt-1">Rp20.000</p>
+</div>
+<button class="w-full py-2 bg-primary text-on-primary rounded-lg text-label-caps font-label-caps flex items-center justify-center gap-1 hover:opacity-90 transition-opacity active:scale-95">
+<span class="material-symbols-outlined text-[16px]" data-icon="add">add</span> Tambah
+                    </button>
+</div>
+</div>
+<!-- Card 4 -->
+<div class="bg-surface-container-lowest rounded-[16px] shadow-[0px_4px_12px_rgba(26,26,26,0.05)] overflow-hidden flex flex-col">
+<div class="aspect-square relative overflow-hidden bg-surface-variant">
+<img alt="Cappuccino" class="w-full h-full object-cover" data-alt="A classic hot Cappuccino with a thick layer of foamed milk and a dusting of cocoa powder on top. Served in a sturdy ceramic cup on a saucer. Warm, inviting cafe atmosphere, professional lighting highlighting the texture." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCmfrIAqmFQv5kk86kE5oY1469xbkVbBIsLD9ldol2fVOrgJL_FXiRrYFsOrnP_SKgxOzHRj3E-aWafPgkPBbXANw705caUKnhUfGFS958pezPHHiKMiJcbX2H8Hm01WqTso_whgzsxKN9SV8oa_VOeJO9OntsO5TX08TiXO6gZ68-pYkgnSiX4NZH_zcz4zEYIeAfYrbQehXgM8xWiLqKHZmcHxjpy8h41soo7yO1bWNPN2iENl8rZ"/>
+</div>
+<div class="p-unit-sm flex flex-col flex-1 justify-between gap-unit-sm">
+<div>
+<h3 class="text-body-lg font-body-lg font-bold leading-tight line-clamp-2">Cappuccino</h3>
+<p class="text-headline-sm font-headline-sm text-primary mt-1">Rp19.000</p>
+</div>
+<button class="w-full py-2 bg-primary text-on-primary rounded-lg text-label-caps font-label-caps flex items-center justify-center gap-1 hover:opacity-90 transition-opacity active:scale-95">
+<span class="material-symbols-outlined text-[16px]" data-icon="add">add</span> Tambah
+                    </button>
+</div>
+</div>
+<!-- Card 5 -->
+<div class="bg-surface-container-lowest rounded-[16px] shadow-[0px_4px_12px_rgba(26,26,26,0.05)] overflow-hidden flex flex-col">
+<div class="aspect-square relative overflow-hidden bg-surface-variant">
+<img alt="Es Teh Manis" class="w-full h-full object-cover" data-alt="A tall glass of refreshing Es Teh Manis (sweet iced tea) with ice cubes and a slice of lemon on the rim. Clear, amber-colored tea with condensation on the glass. Bright, sunny, summery cafe aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAc3yK4rCz3R4__A__cBqEOQMrsLDDg3Fk9vFwEU_AQRZUVIqTNX2G6eo1EsKxHE25hujaBNOHOxN4O3tYUfJCBlYzHq9ODwcbw44UckGxtR3a9g6XaZusFbX7AT-JxsCVAd3dpPTIKBo0BkvjV88TwWzGWG-ESzFL_sEyd5GqNMZvy8SiD0HeG6ynOGqPBiXaVQJD3cSKuN_OWKW3OrXyeOCJa5wlLWrMMTvKDi8nz8mnhQE5upNxe"/>
+</div>
+<div class="p-unit-sm flex flex-col flex-1 justify-between gap-unit-sm">
+<div>
+<h3 class="text-body-lg font-body-lg font-bold leading-tight line-clamp-2">Es Teh Manis</h3>
+<p class="text-headline-sm font-headline-sm text-primary mt-1">Rp8.000</p>
+</div>
+<button class="w-full py-2 bg-primary text-on-primary rounded-lg text-label-caps font-label-caps flex items-center justify-center gap-1 hover:opacity-90 transition-opacity active:scale-95">
+<span class="material-symbols-outlined text-[16px]" data-icon="add">add</span> Tambah
+                    </button>
+</div>
+</div>
+<!-- Card 6 -->
+<div class="bg-surface-container-lowest rounded-[16px] shadow-[0px_4px_12px_rgba(26,26,26,0.05)] overflow-hidden flex flex-col">
+<div class="aspect-square relative overflow-hidden bg-surface-variant">
+<img alt="Croissant" class="w-full h-full object-cover" data-alt="A freshly baked, flaky, golden-brown butter Croissant on a small ceramic plate. Visible buttery layers and crisp texture. Warm morning light, minimalist bakery aesthetic, high resolution." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCVaFhwLYE2J9gt-So1m96tuvubYNvLEmsa92mnXMU2rwjqiaBMImXlL4d9T6UZ-h23OAzILQ6dnSh0xvpE6o7EJ86wAdnjazU9dNwPcbV3e6Y3DMhBKs-plrbumbpAvDt9Ro6WD8LMeDRFOiP81pLVDEnbQ0_0a1_zY-PajwYGm2Rk75IkbnUxqQyIKg_unK4ysETXbK5qH_uMPr-XJvkMK_8SIwvs6IjWW4rlLNsEUQfdkGG77Z_o"/>
+</div>
+<div class="p-unit-sm flex flex-col flex-1 justify-between gap-unit-sm">
+<div>
+<h3 class="text-body-lg font-body-lg font-bold leading-tight line-clamp-2">Croissant</h3>
+<p class="text-headline-sm font-headline-sm text-primary mt-1">Rp16.000</p>
+</div>
+<button class="w-full py-2 bg-primary text-on-primary rounded-lg text-label-caps font-label-caps flex items-center justify-center gap-1 hover:opacity-90 transition-opacity active:scale-95">
+<span class="material-symbols-outlined text-[16px]" data-icon="add">add</span> Tambah
+                    </button>
+</div>
+</div>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 py-3 pb-safe bg-surface-container-lowest border-t border-on-surface/10 rounded-t-xl shadow-[0px_-4px_12px_rgba(26,26,26,0.05)]">
+<a class="flex flex-col items-center justify-center text-on-surface-variant opacity-60 hover:text-primary transition-colors text-label-caps font-label-caps w-16 group" href="#">
+<span class="material-symbols-outlined text-[24px] mb-1 group-hover:scale-110 transition-transform" data-icon="home">home</span>
+<span>Beranda</span>
+</a>
+<a class="flex flex-col items-center justify-center text-primary dark:text-on-surface scale-110 hover:text-primary transition-colors text-label-caps font-label-caps w-16 group active:scale-90 transition-transform duration-150" href="#">
+<span class="material-symbols-outlined text-[24px] mb-1" data-icon="restaurant_menu" style="font-variation-settings: 'FILL' 1;">restaurant_menu</span>
+<span>Menu</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant opacity-60 hover:text-primary transition-colors text-label-caps font-label-caps w-16 group" href="#">
+<span class="material-symbols-outlined text-[24px] mb-1 group-hover:scale-110 transition-transform" data-icon="shopping_basket">shopping_basket</span>
+<span>Keranjang</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant opacity-60 hover:text-primary transition-colors text-label-caps font-label-caps w-16 group" href="#">
+<span class="material-symbols-outlined text-[24px] mb-1 group-hover:scale-110 transition-transform" data-icon="receipt_long">receipt_long</span>
+<span>Status</span>
+</a>
+</nav>
+<style>
+        .pb-safe { padding-bottom: env(safe-area-inset-bottom, 16px); }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</body></html>

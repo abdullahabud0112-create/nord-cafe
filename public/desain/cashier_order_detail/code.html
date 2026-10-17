@@ -1,0 +1,246 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>NORD CAFE - Cashier Detail</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        "colors": {
+                "surface-dim": "#dbdad9",
+                "on-secondary": "#ffffff",
+                "surface-bright": "#fbf9f8",
+                "on-secondary-container": "#6f2e00",
+                "secondary": "#99460d",
+                "tertiary-fixed": "#e6e2df",
+                "status-unpaid": "#6B6B6B",
+                "secondary-fixed-dim": "#ffb68f",
+                "on-tertiary-fixed-variant": "#484645",
+                "surface-variant": "#e4e2e2",
+                "status-completed": "#10B981",
+                "on-secondary-fixed-variant": "#773200",
+                "background-warm": "#F5EBDD",
+                "inverse-primary": "#c8c6c5",
+                "error-container": "#ffdad6",
+                "tertiary-fixed-dim": "#cac6c4",
+                "on-tertiary-container": "#868382",
+                "outline": "#747878",
+                "surface-container-high": "#e9e8e7",
+                "on-error-container": "#93000a",
+                "on-surface": "#1b1c1c",
+                "surface-container-low": "#f5f3f3",
+                "surface-container-lowest": "#ffffff",
+                "on-primary": "#ffffff",
+                "inverse-on-surface": "#f2f0f0",
+                "status-processing": "#F59E0B",
+                "error": "#ba1a1a",
+                "on-background": "#1b1c1c",
+                "surface": "#fbf9f8",
+                "background": "#fbf9f8",
+                "on-error": "#ffffff",
+                "outline-variant": "#c4c7c7",
+                "tertiary": "#000000",
+                "on-primary-fixed-variant": "#474746",
+                "primary-fixed-dim": "#c8c6c5",
+                "surface-tint": "#5f5e5e",
+                "secondary-fixed": "#ffdbca",
+                "primary": "#000000",
+                "surface-container-highest": "#e4e2e2",
+                "on-tertiary": "#ffffff",
+                "secondary-container": "#fd9356",
+                "primary-fixed": "#e5e2e1",
+                "on-tertiary-fixed": "#1c1b1a",
+                "on-primary-container": "#858383",
+                "surface-container": "#efeded",
+                "primary-container": "#1c1b1b",
+                "on-surface-variant": "#444748",
+                "tertiary-container": "#1c1b1a",
+                "on-primary-fixed": "#1c1b1b",
+                "on-secondary-fixed": "#331100",
+                "inverse-surface": "#303031"
+        },
+        "borderRadius": {
+                "DEFAULT": "0.25rem",
+                "lg": "0.5rem",
+                "xl": "0.75rem",
+                "full": "9999px"
+        },
+        "spacing": {
+                "unit-xl": "40px",
+                "gutter": "16px",
+                "margin-mobile": "20px",
+                "unit-sm": "8px",
+                "unit-xs": "4px",
+                "unit-lg": "24px",
+                "unit-md": "16px"
+        },
+        "fontFamily": {
+                "headline-lg": [
+                        "Inter"
+                ],
+                "body-lg": [
+                        "Inter"
+                ],
+                "label-caps": [
+                        "Inter"
+                ],
+                "body-secondary": [
+                        "Inter"
+                ],
+                "headline-sm": [
+                        "Inter"
+                ],
+                "body-md": [
+                        "Inter"
+                ],
+                "headline-md": [
+                        "Inter"
+                ]
+        },
+        "fontSize": {
+                "headline-lg": [
+                        "32px",
+                        {
+                                "lineHeight": "1.2",
+                                "letterSpacing": "-0.02em",
+                                "fontWeight": "700"
+                        }
+                ],
+                "body-lg": [
+                        "16px",
+                        {
+                                "lineHeight": "1.6",
+                                "fontWeight": "400"
+                        }
+                ],
+                "label-caps": [
+                        "12px",
+                        {
+                                "lineHeight": "1",
+                                "letterSpacing": "0.05em",
+                                "fontWeight": "600"
+                        }
+                ],
+                "body-secondary": [
+                        "14px",
+                        {
+                                "lineHeight": "1.6",
+                                "fontWeight": "400"
+                        }
+                ],
+                "headline-sm": [
+                        "20px",
+                        {
+                                "lineHeight": "1.4",
+                                "fontWeight": "600"
+                        }
+                ],
+                "body-md": [
+                        "14px",
+                        {
+                                "lineHeight": "1.6",
+                                "fontWeight": "400"
+                        }
+                ],
+                "headline-md": [
+                        "24px",
+                        {
+                                "lineHeight": "1.3",
+                                "fontWeight": "700"
+                        }
+                ]
+        }
+},
+    },
+  }
+  </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-warm font-body-md text-on-surface antialiased min-h-screen flex flex-col items-center">
+<div class="w-full max-w-[390px] relative bg-background-warm min-h-[844px] flex flex-col shadow-lg">
+<!-- TopAppBar -->
+<header class="bg-surface-container-lowest border-b border-on-surface/5 shadow-sm docked full-width top-0 z-10 sticky">
+<div class="flex justify-between items-center w-full px-margin-mobile h-16 max-w-7xl mx-auto">
+<div class="flex items-center gap-2 hover:bg-surface-variant/20 cursor-pointer p-2 rounded-lg transition-colors">
+<span class="material-symbols-outlined text-primary text-[24px]">point_of_sale</span>
+</div>
+<h1 class="text-headline-md font-headline-md font-bold text-on-surface">NORD CAFE - Kasir</h1>
+<div class="w-8 h-8 rounded-full bg-surface-variant flex items-center justify-center">
+<span class="text-label-caps font-label-caps text-on-surface-variant">A2</span>
+</div>
+</div>
+</header>
+<!-- Main Content -->
+<main class="flex-1 px-margin-mobile py-unit-lg overflow-y-auto pb-32">
+<!-- Header Section -->
+<div class="mb-unit-md">
+<div class="flex items-center gap-3 mb-unit-xs">
+<h2 class="text-headline-sm font-headline-sm font-bold">Detail Pesanan ORD-012</h2>
+<span class="border border-status-unpaid text-status-unpaid text-label-caps font-label-caps px-2 py-1 rounded-full whitespace-nowrap px-3">Belum Dibayar</span>
+</div>
+<div class="flex items-center text-status-unpaid text-body-secondary font-body-secondary gap-1">
+<span class="material-symbols-outlined text-[16px]">schedule</span>
+<span class="">24 Okt 2025, 14:10</span>
+</div>
+</div>
+<!-- Receipt Card -->
+<div class="bg-surface-container-lowest rounded-xl shadow-[0px_4px_12px_rgba(26,26,26,0.05)] p-gutter">
+<h3 class="text-label-caps font-label-caps text-status-unpaid mb-unit-md">ITEM PESANAN</h3>
+<div class="flex flex-col gap-unit-md">
+<!-- Item 1 -->
+<div class="flex justify-between items-start">
+<div>
+<p class="font-bold text-body-lg">Kopi Susu Gula Aren</p>
+<p class="text-status-unpaid text-body-secondary font-body-secondary">x2</p>
+</div>
+<p class="font-bold text-body-lg">Rp36.000</p>
+</div>
+<!-- Item 2 -->
+<div class="flex justify-between items-start">
+<div>
+<p class="font-bold text-body-lg">Croissant</p>
+<p class="text-status-unpaid text-body-secondary font-body-secondary">x1</p>
+</div>
+<p class="font-bold text-body-lg">Rp16.000</p>
+</div>
+<!-- Item 3 -->
+<div class="flex justify-between items-start">
+<div>
+<p class="font-bold text-body-lg">Matcha Latte</p>
+<p class="text-status-unpaid text-body-secondary font-body-secondary">x1</p>
+</div>
+<p class="font-bold text-body-lg">Rp20.000</p>
+</div>
+</div>
+<hr class="border-t border-dashed border-status-unpaid/30 my-unit-md">
+<!-- Total -->
+<div class="flex justify-between items-center">
+<p class="text-headline-sm font-headline-sm font-bold">Total</p>
+<p class="text-headline-sm font-headline-sm font-bold">Rp72.000</p>
+</div>
+</div>
+</main>
+<!-- Action Area (Sticky Bottom relative to container) -->
+<div class="absolute bottom-0 left-0 w-full bg-background-warm px-margin-mobile py-unit-md z-20">
+<div class="flex gap-unit-sm w-full">
+<button class="w-[35%] border border-primary text-primary text-body-lg font-bold rounded-[12px] py-3 flex items-center justify-center hover:bg-primary/5 transition-colors">
+          Batal
+        </button>
+<button class="w-[65%] bg-primary text-on-primary text-body-lg font-bold rounded-[12px] py-3 flex items-center justify-center gap-2 hover:bg-primary/90 transition-colors">
+<span class="material-symbols-outlined text-[20px]">sell</span>
+          Konfirmasi / Scan
+        </button>
+</div>
+</div>
+</div>
+
+
+</body></html>

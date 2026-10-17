@@ -1,0 +1,146 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+
+:root {
+    --nord-bg: #0F172A;
+    --nord-card: #1E293B;
+    --nord-card-hover: #334155;
+    --nord-teal: #2DD4BF;
+    --nord-teal-dark: #0D9488;
+    --nord-ice: #38BDF8;
+    --nord-amber: #F59E0B;
+    --nord-rose: #FB7185;
+    --nord-text-main: #F8FAFC;
+    --nord-text-muted: #94A3B8;
+    --nord-border: rgba(255, 255, 255, 0.08);
+    --nord-glass: rgba(30, 41, 59, 0.75);
+}
+
+body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    background-color: var(--nord-bg);
+    color: var(--nord-text-main);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+h1, h2, h3, h4, h5, h6, .font-heading {
+    font-family: 'Outfit', sans-serif;
+}
+
+.glass-card {
+    background: var(--nord-glass);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--nord-border);
+    border-radius: 1.25rem;
+}
+
+.glass-card-hover {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-card-hover:hover {
+    transform: translateY(-4px);
+    border-color: rgba(45, 212, 191, 0.3);
+    box-shadow: 0 12px 30px -10px rgba(45, 212, 191, 0.15);
+}
+
+.nord-btn-primary {
+    background: linear-gradient(135deg, #2DD4BF 0%, #0D9488 100%);
+    color: #0F172A;
+    font-weight: 700;
+    transition: all 0.2s ease;
+}
+
+.nord-btn-primary:hover {
+    transform: scale(1.02);
+    box-shadow: 0 0 20px rgba(45, 212, 191, 0.4);
+}
+
+.nord-btn-secondary {
+    background: #334155;
+    color: #F8FAFC;
+    font-weight: 600;
+    border: 1px solid var(--nord-border);
+    transition: all 0.2s ease;
+}
+
+.nord-btn-secondary:hover {
+    background: #475569;
+}
+
+.badge-status {
+    padding: 0.35rem 0.85rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.badge-pending {
+    background: rgba(245, 158, 11, 0.15);
+    color: #FBBF24;
+    border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.badge-preparing {
+    background: rgba(56, 189, 248, 0.15);
+    color: #38BDF8;
+    border: 1px solid rgba(56, 189, 248, 0.3);
+}
+
+.badge-ready {
+    background: rgba(45, 212, 191, 0.15);
+    color: #2DD4BF;
+    border: 1px solid rgba(45, 212, 191, 0.3);
+}
+
+.badge-completed {
+    background: rgba(148, 163, 184, 0.15);
+    color: #CBD5E1;
+    border: 1px solid rgba(148, 163, 184, 0.3);
+}
+
+/* Custom Barcode & QR Styling */
+.barcode-strip {
+    height: 60px;
+    background: repeating-linear-gradient(
+        90deg,
+        #000,
+        #000 2px,
+        #fff 2px,
+        #fff 5px,
+        #000 5px,
+        #000 9px,
+        #fff 9px,
+        #fff 11px
+    );
+    border-radius: 6px;
+}
+
+.animate-pulse-glow {
+    animation: pulse-glow 2s infinite ease-in-out;
+}
+
+@keyframes pulse-glow {
+    0%, 100% { box-shadow: 0 0 15px rgba(45, 212, 191, 0.2); }
+    50% { box-shadow: 0 0 30px rgba(45, 212, 191, 0.6); }
+}
+
+/* Smooth scrollbar */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+::-webkit-scrollbar-track {
+    background: #0F172A;
+}
+::-webkit-scrollbar-thumb {
+    background: #334155;
+    border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #2DD4BF;
+}
