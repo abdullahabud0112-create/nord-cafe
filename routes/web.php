@@ -6,6 +6,15 @@ use App\Http\Controllers\CashierController;
 
 // Customer Self-Order Routes (matching Nordic Brew System design flow)
 Route::get('/', [CustomerController::class, 'catalog'])->name('customer.catalog');
+
+// Health check for deployment smoke tests (Vercel container guide)
+Route::get('/health', static function (): \Illuminate\Http\JsonResponse {
+    return response()->json([
+        'status' => 'ok',
+        'framework' => 'Laravel',
+        'timestamp' => now()->toIso8601String(),
+    ]);
+});
 Route::redirect('/catalog', '/');
 Route::get('/product/{id}', [CustomerController::class, 'productDetail'])->name('customer.productDetail');
 Route::get('/cart', [CustomerController::class, 'cart'])->name('customer.cart');

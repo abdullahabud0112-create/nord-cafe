@@ -17,6 +17,10 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'role' => EnsureCashierRole::class,
         ]);
+
+        // Vercel terminates TLS at the edge and forwards via proxies, so the
+        // X-Forwarded-* headers must be trusted for correct HTTPS/IP detection.
+        $middleware->trustProxies(at: '*');
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->render(function (NotFoundHttpException $e, Request $request) {

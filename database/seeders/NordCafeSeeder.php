@@ -153,7 +153,7 @@ class NordCafeSeeder extends Seeder
                     'icon' => 'fa-drumstick-bite',
                 ],
                 'products' => [
-                    ['name' => 'Tenderloin Wagyu 200gr', 'price' => 69000, 'tags' => 'Premium,Wagyu', 'calories' => 520, 'image_url' => 'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=600&q=80'],
+                    ['name' => 'Tenderloin Wagyu 200gr', 'price' => 69000, 'tags' => 'Premium,Wagyu', 'calories' => 520, 'image_url' => '/steak_wagyu_tenderloin.jpeg'],
                     ['name' => 'Sirloin Wagyu 200gr', 'price' => 66000, 'tags' => 'Premium,Wagyu', 'calories' => 550, 'image_url' => 'https://images.unsplash.com/photo-1600891964599-f61ba0e24092?auto=format&fit=crop&w=600&q=80'],
                     ['name' => 'Chicken Ori 200gr', 'price' => 39000, 'tags' => 'Grilled,Protein', 'calories' => 430, 'image_url' => 'https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?auto=format&fit=crop&w=600&q=80'],
                 ]
@@ -196,8 +196,8 @@ class NordCafeSeeder extends Seeder
                     ['name' => 'Chicken Blackpaper', 'price' => 20000, 'tags' => 'Spicy', 'calories' => 480, 'image_url' => 'https://images.unsplash.com/photo-1562967914-608f82629710?auto=format&fit=crop&w=600&q=80'],
                     ['name' => 'Chicken Barbeque', 'price' => 20000, 'tags' => 'Smoky,BBQ', 'calories' => 510, 'image_url' => 'https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?auto=format&fit=crop&w=600&q=80'],
                     ['name' => 'Chicken Wings Ori', 'price' => 25000, 'tags' => 'Crispy', 'calories' => 560, 'image_url' => 'https://images.unsplash.com/photo-1567620832903-9fc6debc209f?auto=format&fit=crop&w=600&q=80'],
-                    ['name' => 'Chicken Wings Spicy', 'price' => 27000, 'tags' => 'Spicy,Hot', 'calories' => 580, 'image_url' => 'https://images.unsplash.com/photo-1527477321055-43615b65171d?auto=format&fit=crop&w=600&q=80'],
-                    ['name' => 'Chicken Wings Sambal', 'price' => 27000, 'tags' => 'Pedas,Favorite', 'calories' => 590, 'image_url' => 'https://images.unsplash.com/photo-1562967914-608f82629710?auto=format&fit=crop&w=600&q=80'],
+                    ['name' => 'Chicken Wings Spicy', 'price' => 27000, 'tags' => 'Spicy,Hot', 'calories' => 580, 'image_url' => '/chiken_spicy_wings.jpeg'],
+                    ['name' => 'Chicken Wings Sambal Bawang', 'price' => 27000, 'tags' => 'Pedas,Favorite', 'calories' => 590, 'image_url' => '/chicken_wings_sambal_bawang.jpeg'],
                     ['name' => 'Beef Slice Blackpaper', 'price' => 32000, 'tags' => 'Beef,Bestseller', 'calories' => 540, 'image_url' => 'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=600&q=80'],
                     ['name' => 'Beef Slice Barbeque', 'price' => 32000, 'tags' => 'Beef,Savory', 'calories' => 550, 'image_url' => 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=600&q=80'],
                     ['name' => 'Beef Slice Sambal B', 'price' => 32000, 'tags' => 'Beef,Pedas', 'calories' => 560, 'image_url' => 'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=600&q=80'],
@@ -276,6 +276,7 @@ class NordCafeSeeder extends Seeder
                     ['name' => 'Martabak Mesir', 'price' => 21000, 'tags' => 'Savory', 'calories' => 390, 'image_url' => 'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?auto=format&fit=crop&w=600&q=80'],
                     ['name' => 'Otak Otak', 'price' => 18000, 'tags' => 'Gurih', 'calories' => 290, 'image_url' => 'https://images.unsplash.com/photo-1563245372-f21724e3856d?auto=format&fit=crop&w=600&q=80'],
                     ['name' => 'Cireng Sambal Rujak', 'price' => 17000, 'tags' => 'Bestseller', 'calories' => 320, 'image_url' => 'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?auto=format&fit=crop&w=600&q=80'],
+                    ['name' => 'Mukbang Platter', 'price' => 99000, 'tags' => 'Sharing,Platter', 'calories' => 850, 'image_url' => '/mukbang_platter.jpeg', 'description' => 'Platter komplit untuk sharing: kentang, ayam crispy, sosis, dan saus andalan Nord Cafe'],
                 ]
             ],
             [
@@ -319,9 +320,9 @@ class NordCafeSeeder extends Seeder
                     'icon' => 'fa-carrot',
                 ],
                 'products' => [
-                    ['name' => 'Chicken Salad', 'price' => 26000, 'tags' => 'Healthy,Fresh', 'calories' => 280, 'image_url' => 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=600&q=80'],
+                    ['name' => 'Chicken Salad', 'price' => 26000, 'tags' => 'Healthy,Fresh', 'calories' => 280, 'image_url' => '/chicken_salad.jpeg'],
                     ['name' => 'Maryam Salad', 'price' => 26000, 'tags' => 'Unique', 'calories' => 320, 'image_url' => 'https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=600&q=80'],
-                    ['name' => 'Kentang Bolognese', 'price' => 26000, 'tags' => 'Bestseller,Snack', 'calories' => 430, 'image_url' => 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=600&q=80'],
+                    ['name' => 'Kentang Bolognese', 'price' => 26000, 'tags' => 'Bestseller,Snack', 'calories' => 430, 'image_url' => '/kentang_bolognese.jpeg'],
                 ]
             ],
         ];
