@@ -33,6 +33,11 @@ RUN composer install \
     --prefer-dist
 
 COPY . .
+
+# Remove stale dev-only bootstrap cache (e.g. Laravel\Pail\PailServiceProvider)
+# so Laravel re-discovers production packages at runtime without DB access.
+RUN rm -f bootstrap/cache/packages.php bootstrap/cache/services.php bootstrap/cache/config.php
+
 RUN mkdir -p \
         storage/framework/cache \
         storage/framework/sessions \

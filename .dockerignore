@@ -14,6 +14,9 @@ public/storage
 
 database/database.sqlite
 
+bootstrap/cache/*.php
+!.gitignore
+
 *.log
 test_supabase.js
 tmp_check.php
