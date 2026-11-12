@@ -44,7 +44,7 @@ RUN mkdir -p \
         storage/framework/views \
         storage/logs \
         bootstrap/cache \
-    && composer dump-autoload --no-dev
+    && composer dump-autoload --no-dev --no-scripts
 
 # Runtime image
 FROM base AS runtime
