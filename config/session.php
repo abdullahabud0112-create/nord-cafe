@@ -13,12 +13,21 @@ return [
     | incoming requests. Laravel supports a variety of storage options to
     | persist session data. Database storage is a great default choice.
     |
+    | On Vercel the app runs as an ephemeral container: instance filesystems
+    | are wiped between scale events and the shared Postgres session table
+    | may not accept writes from the app role, which silently regenerates the
+    | session on every request (symptom: 419 "CSRF token mismatch" on POST).
+    | The encrypted "cookie" driver keeps the session entirely client-side
+    | (CSRF token included), needs no server storage, and works across
+    | instance churn. Set SESSION_DRIVER explicitly to override for local
+    | development or a verified persistent store.
+    |
     | Supported: "file", "cookie", "database", "memcached",
     |            "redis", "dynamodb", "array"
     |
     */
 
-    'driver' => env('SESSION_DRIVER', 'database'),
+    'driver' => env('SESSION_DRIVER', 'cookie'),
 
     /*
     |--------------------------------------------------------------------------

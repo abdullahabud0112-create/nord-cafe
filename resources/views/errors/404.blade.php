@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NORD CAFE - Halaman Tidak Ditemukan</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=3">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png?v=3">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png?v=3">
+    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=3">
     <script>
         document.documentElement.classList.add('dark');
         document.documentElement.style.colorScheme = 'dark';

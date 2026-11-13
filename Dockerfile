@@ -56,14 +56,18 @@ COPY --chown=www-data:www-data Caddyfile /etc/frankenphp/Caddyfile
 RUN setcap CAP_NET_BIND_SERVICE=+eip /usr/local/bin/frankenphp \
     && chown -R www-data:www-data /config/caddy /data/caddy
 
-# CACHE_STORE / SESSION_DRIVER hit Postgres (Supabase), so they need DB_* env
-# vars from Vercel. Override them on Vercel if the app outgrows the defaults.
+# CACHE_STORE hits Postgres (Supabase) and needs DB_* env vars from Vercel.
+# SESSION_DRIVER defaults to "cookie": Vercel container instances are ephemeral
+# and the shared Postgres session table is not guaranteed writable from the
+# app role, which silently regenerates the session on every request and breaks
+# CSRF on POST (419). The cookie driver keeps sessions client-side. Override
+# on Vercel only with a verified persistent store (e.g. redis).
 ENV PORT=80 \
     APP_ENV=production \
     APP_DEBUG=false \
     LOG_CHANNEL=stderr \
     QUEUE_CONNECTION=sync \
-    SESSION_DRIVER=database \
+    SESSION_DRIVER=cookie \
     CACHE_STORE=database
 
 USER www-data
