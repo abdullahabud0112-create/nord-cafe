@@ -2,14 +2,20 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Events\OrderStatusUpdated;
-use App\Models\Order;
-use App\Models\Product;
+use App\Http\Controllers\Concerns\ResolvesDepartmentOrders;
 use App\Models\Category;
+use App\Models\Order;
+use App\Models\OrderItem;
+use App\Models\Product;
+use Illuminate\Http\Request;
 
 class CashierController extends Controller
 {
+    use ResolvesDepartmentOrders;
+
+    private const DEPARTMENT = OrderItem::DEPARTMENT_CASHIER;
+
     /**
      * Look up an order by numeric id or order_number (QR / barcode flow).
      * Rejects malformed identifiers up front so bad input can never reach
@@ -57,43 +63,118 @@ class CashierController extends Controller
             ->with('error', $message);
     }
 
-    // Screen: Cashier Incoming Orders (public/desain/cashier_incoming_orders)
+    // Screen: Cashier Incoming Orders — drinks only
     public function incomingOrders(Request $request)
     {
         $statusFilter = $request->get('status', 'active');
-        $query = Order::with('items.product')->latest();
+
+        $query = Order::query()
+            ->where('status', '!=', 'cancelled')
+            ->whereHas('items', fn ($items) => $items->where('department', self::DEPARTMENT))
+            ->with([
+                'items' => fn ($items) => $items
+                    ->where('department', self::DEPARTMENT)
+                    ->with('product'),
+            ]);
 
         if ($statusFilter === 'completed') {
-            // Riwayat tab (Completed orders)
-            $query->where('status', 'completed');
-        } elseif ($statusFilter === 'active') {
-            // Active orders tab (Sudah Dibayar, Sedang Diproses, Belum Dibayar)
-            $query->whereIn('status', ['paid', 'preparing', 'ready', 'unpaid', 'pending']);
+            $query->whereDoesntHave('items', fn ($items) => $items
+                ->where('department', self::DEPARTMENT)
+                ->whereIn('status', [OrderItem::STATUS_PENDING, OrderItem::STATUS_PREPARING]));
+        } else {
+            $query->whereHas('items', fn ($items) => $items
+                ->where('department', self::DEPARTMENT)
+                ->whereIn('status', [OrderItem::STATUS_PENDING, OrderItem::STATUS_PREPARING]));
         }
 
-        $orders = $query->get();
+        $orders = $statusFilter === 'completed'
+            ? $query->latest('updated_at')->get()
+            : $query->oldest()->get();
 
         $stats = [
-            'active' => Order::whereIn('status', ['paid', 'preparing', 'ready', 'unpaid', 'pending'])->count(),
-            'paid' => Order::where('status', 'paid')->count(),
-            'preparing' => Order::whereIn('status', ['preparing', 'ready'])->count(),
-            'completed' => Order::where('status', 'completed')->count(),
-            'all' => Order::count(),
+            'pending' => (int) OrderItem::where('department', self::DEPARTMENT)
+                ->where('status', OrderItem::STATUS_PENDING)
+                ->sum('quantity'),
+            'preparing' => (int) OrderItem::where('department', self::DEPARTMENT)
+                ->where('status', OrderItem::STATUS_PREPARING)
+                ->sum('quantity'),
+            'completed' => (int) OrderItem::where('department', self::DEPARTMENT)
+                ->where('status', OrderItem::STATUS_COMPLETED)
+                ->sum('quantity'),
+            'unpaid_orders' => Order::whereHas('items', fn ($items) => $items->where('department', self::DEPARTMENT))
+                ->where('payment_status', '!=', 'paid')
+                ->whereNotIn('status', ['paid', 'preparing', 'ready', 'completed', 'cancelled'])
+                ->count(),
         ];
 
-        return view('cashier.incoming-orders', compact('orders', 'statusFilter', 'stats'));
+        $feedSignature = $this->feedSignature();
+
+        return view('cashier.incoming-orders', compact('orders', 'statusFilter', 'stats', 'feedSignature'));
     }
 
-    // Screen: Cashier Order Detail (public/desain/cashier_order_detail)
+    // Screen: Cashier Order Detail — drinks only
     public function orderDetail($id)
     {
-        $order = $this->findOrder((string) $id);
+        $order = $this->findDepartmentOrder((string) $id, self::DEPARTMENT);
 
         if (! $order) {
             return $this->orderNotFoundWeb();
         }
 
         return view('cashier.order-detail', compact('order'));
+    }
+
+    // Action: update every drink item of an order
+    public function updateDepartmentStatus(Request $request, $id)
+    {
+        $order = $this->findDepartmentOrder((string) $id, self::DEPARTMENT);
+
+        if (! $order) {
+            return $request->expectsJson() ? $this->orderNotFoundJson() : $this->orderNotFoundWeb();
+        }
+
+        return $this->applyDepartmentStatus($request, $order, self::DEPARTMENT);
+    }
+
+    // Action: update a single drink item
+    public function updateItemStatus(Request $request, $id, $itemId)
+    {
+        $order = $this->findDepartmentOrder((string) $id, self::DEPARTMENT);
+
+        if (! $order) {
+            return $request->expectsJson() ? $this->orderNotFoundJson() : $this->orderNotFoundWeb();
+        }
+
+        return $this->applyDepartmentStatus($request, $order, self::DEPARTMENT, (int) $itemId);
+    }
+
+    // Lightweight polling endpoint so new drink orders appear automatically.
+    public function feed()
+    {
+        return response()->json([
+            'signature' => $this->feedSignature(),
+            'pending' => OrderItem::where('department', self::DEPARTMENT)
+                ->where('status', OrderItem::STATUS_PENDING)
+                ->count(),
+            'preparing' => OrderItem::where('department', self::DEPARTMENT)
+                ->where('status', OrderItem::STATUS_PREPARING)
+                ->count(),
+        ]);
+    }
+
+    private function feedSignature(): string
+    {
+        $orders = Order::query()
+            ->whereHas('items', fn ($items) => $items->where('department', self::DEPARTMENT))
+            ->get(['id', 'status', 'updated_at'])
+            ->map(fn (Order $order) => 'o' . $order->id . ':' . $order->status . ':' . optional($order->updated_at)->timestamp);
+
+        $items = OrderItem::query()
+            ->where('department', self::DEPARTMENT)
+            ->get(['id', 'status', 'updated_at'])
+            ->map(fn (OrderItem $item) => 'i' . $item->id . ':' . $item->status . ':' . optional($item->updated_at)->timestamp);
+
+        return md5($orders->concat($items)->implode('|'));
     }
 
     // Screen: Cashier Scan Barcode (public/desain/cashier_scan_barcode)
@@ -166,9 +247,15 @@ class CashierController extends Controller
             return redirect()->route('cashier.incomingOrders')->with('success', 'Pembayaran pesanan ' . $order->order_number . ' sudah terkonfirmasi.');
         }
 
-        $order->status = 'paid';
         $order->payment_status = 'paid';
+        $order->status = 'paid';
         $order->save();
+
+        // Departments may already have processed items while payment was
+        // pending. Restore the aggregated operational status without ever
+        // touching payment_status.
+        $order->syncStatusFromItems();
+        $order->refresh();
 
         event(new OrderStatusUpdated($order));
 
@@ -184,10 +271,11 @@ class CashierController extends Controller
         return redirect()->route('cashier.incomingOrders')->with('success', 'Pesanan ' . $order->order_number . ' telah dikonfirmasi (SUDAH DIBAYAR).');
     }
 
-    // Screen: Cashier Update Status (public/desain/cashier_update_status)
+    // Screen: Cashier verification page reached by scanning the customer QR.
+    // Shows the drink slice plus the payment confirmation controls.
     public function editStatus($id)
     {
-        $order = $this->findOrder((string) $id);
+        $order = $this->findDepartmentOrder((string) $id, self::DEPARTMENT);
 
         if (! $order) {
             return $this->orderNotFoundWeb();
@@ -234,6 +322,14 @@ class CashierController extends Controller
         // Forward-only transitions; resets back to unpaid are rejected.
         if (! $order->canTransitionTo($newStatus)) {
             $message = 'Transisi status dari "' . $order->status_label . '" ke "' . (new Order(['status' => $newStatus]))->status_label . '" tidak diizinkan.';
+            return $request->wantsJson() ? $this->transitionRejectedJson($message) : $this->transitionRejectedWeb($order, $message);
+        }
+
+        // The order-level legacy endpoint may never fake completion while a
+        // department still has unfinished items. Each station closes its own
+        // slice through the department endpoints.
+        if ($newStatus === 'completed' && $order->hasUnfinishedItems()) {
+            $message = 'Pesanan ' . $order->order_number . ' belum dapat diselesaikan karena masih ada item yang belum selesai.';
             return $request->wantsJson() ? $this->transitionRejectedJson($message) : $this->transitionRejectedWeb($order, $message);
         }
 

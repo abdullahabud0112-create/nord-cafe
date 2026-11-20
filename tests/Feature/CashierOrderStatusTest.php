@@ -3,7 +3,9 @@
 namespace Tests\Feature;
 
 use App\Events\OrderStatusUpdated;
+use App\Models\Category;
 use App\Models\Order;
+use App\Models\Product;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
@@ -13,9 +15,9 @@ class CashierOrderStatusTest extends TestCase
 {
     use RefreshDatabase;
 
-    private function makeOrder(string $status = 'unpaid', array $extra = []): Order
+    private function makeOrder(string $status = 'unpaid', array $extra = [], array $items = []): Order
     {
-        return Order::create(array_merge([
+        $order = Order::create(array_merge([
             'order_number' => 'ORD-TST-' . uniqid(),
             'customer_name' => 'Tester',
             'status' => $status,
@@ -26,6 +28,22 @@ class CashierOrderStatusTest extends TestCase
             'order_type' => 'dine_in',
             'table_number' => 'Meja 01',
         ], $extra));
+
+        foreach ($items as $item) {
+            $quantity = $item['quantity'] ?? 1;
+            $unitPrice = $item['unit_price'] ?? $item['product']->price;
+
+            $order->items()->create([
+                'product_id' => $item['product']->id,
+                'quantity' => $quantity,
+                'unit_price' => $unitPrice,
+                'options_json' => $item['options'] ?? [],
+                'item_notes' => $item['notes'] ?? null,
+                'subtotal' => $unitPrice * $quantity,
+            ]);
+        }
+
+        return $order->fresh();
     }
 
     public function test_edit_status_missing_order_redirects_with_friendly_error(): void
@@ -170,12 +188,34 @@ class CashierOrderStatusTest extends TestCase
         $this->get('/cashier')->assertOk();
     }
 
-    public function test_customer_role_gets_403_on_cashier_routes(): void
+    public function test_any_authenticated_user_can_access_cashier_routes(): void
     {
+        // No login system — any authenticated user can access cashier routes.
+        // Department isolation is enforced at the item level in controllers.
         $user = User::factory()->create(['role' => 'customer']);
 
-        $this->actingAs($user)->get('/cashier')->assertStatus(403);
-        $this->actingAs($user)->get('/cashier/order/1/update-status')->assertStatus(403);
+        $this->actingAs($user)->get('/cashier')->assertOk();
+
+        // Create a valid order with a drink item to test the detail page
+        $drinkCategory = Category::create([
+            'name' => 'Minuman',
+            'slug' => 'minuman-' . uniqid(),
+            'type' => 'minuman',
+            'icon' => 'local_cafe',
+            'is_active' => true,
+        ]);
+        $drink = Product::create([
+            'category_id' => $drinkCategory->id,
+            'name' => 'Test Drink',
+            'slug' => 'test-drink-' . uniqid(),
+            'description' => 'Test',
+            'price' => 30000,
+            'image_url' => '/placeholder.svg',
+            'is_available' => true,
+        ]);
+        $order = $this->makeOrder('unpaid', [], [['product' => $drink, 'quantity' => 1]]);
+
+        $this->actingAs($user)->get(route('cashier.editStatus', $order->id))->assertOk();
     }
 
     public function test_cashier_role_passes_soft_gate(): void

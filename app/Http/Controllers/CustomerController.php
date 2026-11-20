@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Category;
-use App\Models\Product;
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Models\Product;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class CustomerController extends Controller
@@ -142,13 +143,60 @@ class CustomerController extends Controller
     // Screen: Shopping Cart (public/desain/shopping_cart)
     public function cart()
     {
-        return view('customer.cart');
+        // Same id => type map as checkout: cart splits "isi pesanan" into
+        // Makanan/Minuman groups and routes the Checkout button accordingly.
+        $productTypes = $this->productTypeMap();
+
+        return view('customer.cart', compact('productTypes'));
+    }
+
+    /**
+     * id => 'minuman' | 'makanan' for every product. Lets the client split the
+     * localStorage cart (which predates category_type on some saved items)
+     * without a network round trip.
+     */
+    private function productTypeMap(): array
+    {
+        return Product::query()
+            ->with('category:id,type')
+            // category_id must be selected — belongsTo needs it to match parents
+            ->get(['id', 'category_id'])
+            ->mapWithKeys(fn (Product $p): array => [
+                (string) $p->id => ($p->category?->type === 'minuman') ? 'minuman' : 'makanan',
+            ])
+            ->all();
     }
 
     // Screen: Checkout (public/desain/checkout)
-    public function checkout()
+    // Order confirmation is split into 2 pages: Minuman (drink) → Makanan (food).
+    // One order is still created at the end; the split is only a per-group review step.
+    //
+    // URLs:
+    //   /checkout           — legacy entry, renders the Minuman page (?step=food still honored)
+    //   /checkout/minuman   — canonical step 1 (customer.checkoutDrink)
+    //   /checkout/makanan   — canonical step 2, payment + totals (customer.checkoutFood)
+    public function checkout(Request $request)
     {
-        return view('customer.checkout');
+        $step = $request->query('step') === 'food' ? 'food' : 'drink';
+
+        return $this->renderCheckout($step);
+    }
+
+    public function checkoutDrink()
+    {
+        return $this->renderCheckout('drink');
+    }
+
+    public function checkoutFood()
+    {
+        return $this->renderCheckout('food');
+    }
+
+    private function renderCheckout(string $step)
+    {
+        $productTypes = $this->productTypeMap();
+
+        return view('customer.checkout', compact('step', 'productTypes'));
     }
 
     // Process Place Order (public/desain logic: creates order in 'unpaid' state, shows ticket)
@@ -156,49 +204,83 @@ class CustomerController extends Controller
     {
         $request->validate([
             'items' => 'required|array|min:1',
+            'items.*.product_id' => 'required|exists:products,id',
+            'items.*.quantity' => 'required|integer|min:1',
+            'items.*.options' => 'nullable|array',
+            'items.*.notes' => 'nullable|string|max:500',
+            'items.*.item_notes' => 'nullable|string|max:500',
         ]);
 
-        // Generate clean order number matching design (e.g. ORD-240815-012 or ORD-012)
-        $latestId = Order::max('id') ?? 0;
-        $orderSeq = sprintf('%03d', ($latestId + 1) % 1000);
-        $orderNumber = 'ORD-' . date('ymd') . '-' . $orderSeq;
+        $products = Product::with('category')
+            ->whereIn('id', collect($request->items)->pluck('product_id'))
+            ->get()
+            ->keyBy('id');
 
-        $subtotal = 0;
-        foreach ($request->items as $item) {
-            $unitPrice = $item['unit_price'] ?? $item['price'] ?? 0;
-            $subtotal += ($unitPrice * $item['quantity']);
-        }
+        // One order, one order number, one payment total — the Cashier/Kitchen
+        // split happens only at item level via the department snapshot.
+        $order = DB::transaction(function () use ($request, $products) {
+            $subtotal = 0;
+            $lineItems = [];
 
-        $tax = (int) round($subtotal * 0.10);
-        $total = $subtotal + $tax;
+            foreach ($request->items as $item) {
+                $product = $products->get($item['product_id']);
 
-        $order = Order::create([
-            'order_number' => $orderNumber,
-            'customer_name' => $request->customer_name ?: 'Pelanggan',
-            'table_number' => $request->table_number ?: 'Meja 04',
-            'order_type' => $request->order_type ?: 'dine_in',
-            'status' => 'unpaid', // Initial state: Belum Dibayar (Menunggu Verifikasi Kasir)
-            'payment_status' => 'unpaid',
-            'payment_method' => $request->payment_method ?: 'qris',
-            'subtotal' => $subtotal,
-            'tax' => $tax,
-            'total' => $total,
-            'barcode_hash' => $orderNumber,
-            'notes' => $request->notes ?? null,
-        ]);
+                if (! $product) {
+                    abort(422, 'Produk pada pesanan tidak ditemukan.');
+                }
 
-        foreach ($request->items as $item) {
-            $unitPrice = $item['unit_price'] ?? $item['price'] ?? 0;
-            OrderItem::create([
-                'order_id' => $order->id,
-                'product_id' => $item['product_id'],
-                'quantity' => $item['quantity'],
-                'unit_price' => $unitPrice,
-                'options_json' => $item['options'] ?? [],
-                'item_notes' => $item['notes'] ?? $item['item_notes'] ?? null,
-                'subtotal' => $unitPrice * $item['quantity'],
+                // Server-side pricing keeps the transaction integrity intact
+                // even if the client tampers with unit_price / price.
+                $unitPrice = (float) $product->price;
+                $quantity = (int) $item['quantity'];
+                $lineSubtotal = $unitPrice * $quantity;
+                $subtotal += $lineSubtotal;
+
+                $department = $product->category?->type;
+
+                if (! in_array($department, OrderItem::DEPARTMENTS, true)) {
+                    abort(422, 'Kategori produk ' . $product->name . ' tidak valid.');
+                }
+
+                $lineItems[] = [
+                    'product_id' => $product->id,
+                    'quantity' => $quantity,
+                    'unit_price' => $unitPrice,
+                    'options_json' => $item['options'] ?? [],
+                    'item_notes' => $item['notes'] ?? $item['item_notes'] ?? null,
+                    'department' => $department,
+                    'status' => OrderItem::STATUS_PENDING,
+                    'subtotal' => $lineSubtotal,
+                ];
+            }
+
+            // Generate clean order number matching design (e.g. ORD-240815-012 or ORD-012)
+            $latestId = Order::max('id') ?? 0;
+            $orderSeq = sprintf('%03d', ($latestId + 1) % 1000);
+            $orderNumber = 'ORD-' . date('ymd') . '-' . $orderSeq;
+
+            $tax = (int) round($subtotal * 0.10);
+            $total = $subtotal + $tax;
+
+            $order = Order::create([
+                'order_number' => $orderNumber,
+                'customer_name' => $request->customer_name ?: 'Pelanggan',
+                'table_number' => $request->table_number ?: 'Meja 04',
+                'order_type' => $request->order_type ?: 'dine_in',
+                'status' => 'unpaid', // Initial state: Belum Dibayar (Menunggu Verifikasi Kasir)
+                'payment_status' => 'unpaid',
+                'payment_method' => $request->payment_method ?: 'qris',
+                'subtotal' => $subtotal,
+                'tax' => $tax,
+                'total' => $total,
+                'barcode_hash' => $orderNumber,
+                'notes' => $request->notes ?? null,
             ]);
-        }
+
+            $order->items()->createMany($lineItems);
+
+            return $order;
+        });
 
         session(['last_order_number' => $order->order_number]);
 

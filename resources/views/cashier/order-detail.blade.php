@@ -1,105 +1,161 @@
 @extends('layouts.app')
 
-@section('title', 'NORD CAFE - Cashier Detail ' . $order->order_number)
+@section('title', 'NORD CAFE - Cashier Detail Minuman ' . $order->order_number)
 
 @section('content')
-<div class="w-full max-w-[420px] mx-auto relative bg-background-warm min-h-[680px] flex flex-col shadow-lg rounded-2xl overflow-hidden mb-20">
-    <!-- Main Content -->
-    <main class="flex-1 px-margin-mobile py-unit-lg overflow-y-auto pb-32">
-        <!-- Header Section -->
-        <div class="mb-unit-md">
-            <div class="flex items-center justify-between gap-3 mb-unit-xs">
-                <h2 class="text-headline-sm font-headline-sm font-bold tracking-tight">Detail Pesanan {{ $order->order_number }}</h2>
-                
-                @if($order->status == 'unpaid' || $order->status == 'pending')
-                    <span class="status-pill pill-unpaid"><span class="pill-dot"></span>Belum Dibayar</span>
-                @elseif($order->status == 'paid')
-                    <span class="status-pill pill-paid"><span class="pill-dot"></span>Sudah Dibayar</span>
-                @elseif($order->status == 'preparing' || $order->status == 'ready')
-                    <span class="status-pill pill-preparing"><span class="pill-dot"></span>Sedang Diproses</span>
-                @elseif($order->status == 'completed')
-                    <span class="status-pill pill-done"><span class="pill-dot"></span>Selesai</span>
-                @endif
-            </div>
+<main class="flex-1 px-margin-mobile pt-unit-md pb-32 max-w-2xl mx-auto w-full flex flex-col gap-unit-md">
+    <!-- Header -->
+    <div class="flex items-center justify-between gap-3">
+        <a href="{{ route('cashier.incomingOrders') }}" class="w-10 h-10 rounded-xl btn-soft flex items-center justify-center" aria-label="Kembali">
+            <span class="material-symbols-outlined text-xl">arrow_back</span>
+        </a>
+        <div class="text-center">
+            <p class="text-[10px] font-bold uppercase tracking-[0.14em] text-primary">Detail Minuman</p>
+            <h2 class="text-headline-sm font-headline-sm font-bold tracking-tight">{{ $order->order_number }}</h2>
+        </div>
+        <div class="w-10"></div>
+    </div>
 
-            <div class="flex items-center text-status-unpaid text-body-secondary font-body-secondary gap-1">
-                <span class="material-symbols-outlined text-[16px]">schedule</span>
-                <span>{{ $order->created_at->format('d M Y, H:i') }}</span>
-                <span class="mx-1">·</span>
-                <span>{{ $order->table_number ?: ($order->order_type == 'takeaway' ? 'Takeaway' : 'Dine In') }}</span>
+    <!-- Order meta -->
+    <section class="card-soft p-unit-md flex flex-col gap-2">
+        <div class="flex items-center justify-between gap-2">
+            <div>
+                <p class="text-body-lg font-bold text-on-surface">{{ $order->customer_name }}</p>
+                <p class="text-body-secondary text-status-unpaid text-xs mt-0.5">
+                    {{ $order->created_at->format('d M Y, H:i') }} ·
+                    {{ $order->table_number ?: ($order->order_type == 'takeaway' ? 'Takeaway' : 'Dine In') }}
+                </p>
+            </div>
+            <div class="flex flex-col items-end gap-1">
+                <span class="status-pill {{ $order->payment_status_badge_class }}">
+                    <span class="pill-dot"></span>{{ $order->payment_status_label }}
+                </span>
+                <span class="status-pill {{ $order->departmentStatusBadgeClass('minuman') }}">
+                    <span class="pill-dot"></span>{{ $order->departmentStatusLabel('minuman') }}
+                </span>
             </div>
         </div>
 
-        <!-- Receipt Card -->
-        <div class="card-soft p-gutter mb-4">
-            <div class="flex justify-between items-center mb-unit-md">
-                <h3 class="text-label-caps font-label-caps text-status-unpaid uppercase tracking-wider">ITEM PESANAN</h3>
-                <a href="{{ route('cashier.editStatus', $order->id) }}" class="text-xs text-primary font-bold hover:underline flex items-center gap-1">
-                    <span class="material-symbols-outlined text-sm">edit</span> Ubah Status
-                </a>
-            </div>
-            
-            <div class="flex flex-col gap-unit-md">
-                @foreach($order->items as $item)
-                <div class="flex justify-between items-start gap-3">
-                    <div class="flex items-start gap-2 min-w-0">
-                        <span class="shrink-0 mt-0.5 px-1.5 py-0.5 rounded-md bg-surface-container text-on-surface-variant text-[11px] font-bold">{{ $item->quantity }}x</span>
-                        <p class="font-semibold text-body-lg text-on-surface truncate">{{ $item->product->name ?? 'Menu Item' }}</p>
-                    </div>
-                    <p class="font-bold text-body-lg text-on-surface whitespace-nowrap">Rp{{ number_format($item->subtotal, 0, ',', '.') }}</p>
+        @if($order->notes)
+            <p class="text-xs text-status-unpaid bg-surface-container-low rounded-xl px-3 py-2">
+                <span class="font-semibold text-on-surface">Catatan pesanan:</span> {{ $order->notes }}
+            </p>
+        @endif
+
+        @if(! $order->isPaymentSettled())
+            <form action="{{ route('cashier.confirmPayment', $order->id) }}" method="POST" class="mt-1">
+                @csrf
+                <button type="submit" class="btn-cta w-full py-3 text-sm flex justify-center items-center gap-2">
+                    <span class="material-symbols-outlined text-base">sell</span> Konfirmasi Pembayaran
+                </button>
+            </form>
+        @endif
+    </section>
+
+    @if($order->status === 'cancelled')
+        <section class="card-soft p-6 text-center">
+            <span class="material-symbols-outlined text-4xl text-status-unpaid">block</span>
+            <p class="font-semibold text-on-surface mt-2">Pesanan ini dibatalkan dan tidak dapat diproses.</p>
+        </section>
+    @endif
+
+    <!-- Drink items -->
+    <section class="card-soft p-unit-md">
+        <div class="flex items-center justify-between mb-3">
+            <h3 class="text-label-caps font-label-caps text-status-unpaid uppercase tracking-wider">
+                Item Minuman ({{ $order->departmentItemCount('minuman') }})
+            </h3>
+            @if($order->departmentStatus('minuman') !== 'completed' && $order->status !== 'cancelled')
+                <div class="flex gap-2">
+                    <form action="{{ route('cashier.updateDepartmentStatus', $order->id) }}" method="POST">
+                        @csrf
+                        <input type="hidden" name="status" value="preparing">
+                        <button type="submit" class="text-xs font-bold px-3 py-1.5 rounded-lg btn-soft">Proses Semua</button>
+                    </form>
+                    <form action="{{ route('cashier.updateDepartmentStatus', $order->id) }}" method="POST">
+                        @csrf
+                        <input type="hidden" name="status" value="completed">
+                        <button type="submit" class="text-xs font-bold px-3 py-1.5 rounded-lg btn-cta-success">Selesai Semua</button>
+                    </form>
                 </div>
-                @endforeach
-            </div>
-
-            <hr class="divider-soft my-unit-md">
-
-            <!-- Total -->
-            <div class="flex justify-between items-center">
-                <p class="text-headline-sm font-headline-sm font-bold text-on-surface">Total</p>
-                <p class="text-headline-sm font-headline-sm font-bold text-primary">Rp{{ number_format($order->total, 0, ',', '.') }}</p>
-            </div>
-        </div>
-    </main>
-
-    <!-- Action Area -->
-    <div class="absolute bottom-0 left-0 w-full bg-background-warm/95 dark:bg-[#121212]/85 backdrop-blur-xl px-margin-mobile py-unit-md z-20 border-t border-on-surface/10 dark:border-white/10">
-        <div class="flex gap-unit-sm w-full">
-            <a href="{{ route('cashier.incomingOrders') }}" class="btn-soft w-[35%] text-body-lg rounded-xl py-3 flex items-center justify-center">
-                Batal
-            </a>
-
-            @if($order->status == 'unpaid' || $order->status == 'pending')
-                <form action="{{ route('cashier.confirmPayment', $order->id) }}" method="POST" class="w-[65%]">
-                    @csrf
-                    <button type="submit" class="btn-cta w-full text-body-lg py-3 flex items-center justify-center gap-2">
-                        <span class="material-symbols-outlined text-[20px]">sell</span>
-                        Konfirmasi / Scan
-                    </button>
-                </form>
-            @elseif($order->status == 'paid')
-                <form action="{{ route('cashier.updateStatus', $order->id) }}" method="POST" class="w-[65%]">
-                    @csrf
-                    <input type="hidden" name="status" value="preparing">
-                    <button type="submit" class="btn-cta w-full text-body-lg py-3 flex items-center justify-center gap-2">
-                        <span class="material-symbols-outlined text-[20px]">play_arrow</span>
-                        Proses Pesanan
-                    </button>
-                </form>
-            @elseif($order->status == 'preparing' || $order->status == 'ready')
-                <form action="{{ route('cashier.updateStatus', $order->id) }}" method="POST" class="w-[65%]">
-                    @csrf
-                    <input type="hidden" name="status" value="completed">
-                    <button type="submit" class="btn-cta-success w-full text-body-lg py-3 flex items-center justify-center gap-2">
-                        <span class="material-symbols-outlined text-[20px]">check</span>
-                        Tandai Selesai
-                    </button>
-                </form>
-            @else
-                <a href="{{ route('cashier.editStatus', $order->id) }}" class="btn-soft w-[65%] text-body-lg py-3 flex items-center justify-center gap-2">
-                    Ubah Status
-                </a>
             @endif
         </div>
-    </div>
-</div>
+
+        @forelse($order->items as $item)
+            <article class="flex flex-col gap-2 py-3 {{ ! $loop->first ? 'border-t border-on-surface/10' : '' }}">
+                <div class="flex items-start gap-3">
+                    <img src="{{ $item->product->image_url ?? '/placeholder.svg' }}"
+                         alt="{{ $item->product->name ?? 'Menu' }}"
+                         class="w-14 h-14 rounded-xl object-cover shrink-0 border border-on-surface/5">
+                    <div class="min-w-0 flex-1">
+                        <div class="flex items-start justify-between gap-2">
+                            <p class="font-semibold text-body-lg text-on-surface leading-tight">{{ $item->product->name ?? 'Menu' }}</p>
+                            <span class="status-pill {{ $item->status_badge_class }} shrink-0">
+                                <span class="pill-dot"></span>{{ $item->status_label }}
+                            </span>
+                        </div>
+                        <p class="text-xs text-status-unpaid mt-1">
+                            Jumlah: <span class="font-semibold text-on-surface">{{ $item->quantity }}x</span>
+                            · Harga: Rp{{ number_format($item->unit_price, 0, ',', '.') }}
+                            · Subtotal: <span class="font-semibold text-on-surface">Rp{{ number_format($item->subtotal, 0, ',', '.') }}</span>
+                        </p>
+                        @if($item->options_display)
+                            <div class="flex flex-wrap gap-1 mt-1.5">
+                                @foreach($item->options_display as $optionLine)
+                                    <span class="text-[11px] px-2 py-0.5 rounded-full bg-surface-container text-on-surface-variant">{{ $optionLine }}</span>
+                                @endforeach
+                            </div>
+                        @endif
+                        @if($item->item_notes)
+                            <p class="text-xs text-[#96561B] mt-1.5 bg-[#E3A15C]/10 rounded-lg px-2.5 py-1.5">
+                                <span class="font-bold">Catatan:</span> {{ $item->item_notes }}
+                            </p>
+                        @endif
+                    </div>
+                </div>
+
+                @if($item->status !== 'completed' && $order->status !== 'cancelled')
+                    <div class="flex justify-end gap-2">
+                        @if($item->status === 'pending')
+                            <form action="{{ route('cashier.updateItemStatus', [$order->id, $item->id]) }}" method="POST">
+                                @csrf
+                                <input type="hidden" name="status" value="preparing">
+                                <button type="submit" class="text-xs font-bold px-3 py-1.5 rounded-lg btn-soft">Proses</button>
+                            </form>
+                        @endif
+                        <form action="{{ route('cashier.updateItemStatus', [$order->id, $item->id]) }}" method="POST">
+                            @csrf
+                            <input type="hidden" name="status" value="completed">
+                            <button type="submit" class="text-xs font-bold px-3 py-1.5 rounded-lg btn-cta-success">Selesai</button>
+                        </form>
+                    </div>
+                @endif
+            </article>
+        @empty
+            <div class="py-6 text-center">
+                <span class="material-symbols-outlined text-4xl text-status-unpaid">no_drinks</span>
+                <p class="text-body-secondary text-status-unpaid mt-1">Pesanan ini tidak memiliki item minuman.</p>
+                <p class="text-xs text-status-unpaid mt-1">Item makanan diproses di halaman Kitchen.</p>
+            </div>
+        @endforelse
+    </section>
+
+    <!-- Summary -->
+    <section class="card-soft p-unit-md flex flex-col gap-2">
+        <div class="flex justify-between text-body-md">
+            <span class="text-status-unpaid">Subtotal minuman</span>
+            <span class="font-semibold">Rp{{ number_format($order->departmentSubtotal('minuman'), 0, ',', '.') }}</span>
+        </div>
+        <div class="flex justify-between text-body-md">
+            <span class="text-status-unpaid">Pajak transaksi</span>
+            <span class="font-semibold">Rp{{ number_format($order->tax, 0, ',', '.') }}</span>
+        </div>
+        <hr class="divider-soft">
+        <div class="flex justify-between">
+            <span class="text-body-lg font-bold">Total Transaksi Utama</span>
+            <span class="text-body-lg font-bold text-primary">Rp{{ number_format($order->total, 0, ',', '.') }}</span>
+        </div>
+        <p class="text-[11px] text-status-unpaid">Satu pesanan, satu kode, satu total. Item makanan tidak ditampilkan di sini dan diproses Kitchen.</p>
+    </section>
+</main>
 @endsection

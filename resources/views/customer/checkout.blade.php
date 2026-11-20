@@ -2,24 +2,49 @@
 
 @section('title', 'NORD CAFE - Checkout')
 
+@php
+    $isFoodStep = $step === 'food';
+    // Stepper chip styles (active vs clickable idle)
+    $chipOn  = 'inline-flex items-center rounded-full border border-primary/40 bg-primary/10 text-primary px-3.5 py-1.5 text-[11px] font-bold uppercase tracking-wider';
+    $chipOff = 'inline-flex items-center rounded-full border border-outline-variant bg-surface-container text-on-surface-variant/70 px-3.5 py-1.5 text-[11px] font-bold uppercase tracking-wider hover:bg-surface-variant/30 transition-colors';
+@endphp
+
 @section('content')
 <main class="flex-1 w-full max-w-2xl mx-auto px-margin-mobile py-unit-lg flex flex-col gap-unit-md pb-[120px]">
-    <!-- Page Title + Back (edit pesanan tanpa tombol back browser) -->
+    <!-- Page Title + Back -->
     <div class="flex items-center gap-3 mb-unit-sm -ml-1">
-        <a href="{{ route('customer.cart') }}" class="btn-icon-back shrink-0" aria-label="Kembali" title="Kembali"
-           onclick="if(history.length>1){event.preventDefault();history.back();}">
+        <a id="btn-back" href="{{ $isFoodStep ? route('customer.checkoutDrink') : route('customer.cart') }}"
+           class="btn-icon-back shrink-0" aria-label="Kembali" title="Kembali">
             <span class="material-symbols-outlined text-xl">arrow_back</span>
         </a>
-        <div class="flex flex-col">
-            <h1 class="font-headline-lg text-headline-lg text-on-surface leading-tight tracking-tight">Checkout</h1>
-            <span class="text-body-secondary text-status-unpaid">Kembali untuk ubah pesanan</span>
-
+        <div class="flex flex-col min-w-0">
+            <h1 class="font-headline-lg text-headline-lg text-on-surface leading-tight tracking-tight">
+                {{ $isFoodStep ? 'Konfirmasi Makanan' : 'Konfirmasi Minuman' }}
+            </h1>
+            <span class="text-body-secondary text-status-unpaid">
+                {{ $isFoodStep ? 'Langkah 2 dari 2 — buat pesanan' : 'Langkah 1 dari 2 — periksa pesananmu' }}
+            </span>
         </div>
     </div>
 
+    <!-- Stepper: Minuman → Makanan -->
+        <div class="flex items-center gap-1.5 -ml-1 mb-unit-sm" aria-label="Langkah konfirmasi pesanan">
+            @if(!$isFoodStep)
+                <span id="chip-step-drink" aria-current="step" class="{{ $chipOn }}">1 · Minuman</span>
+                <span id="chip-step-sep" class="material-symbols-outlined text-base text-outline-variant">chevron_right</span>
+                <a id="chip-step-food" href="{{ route('customer.checkoutFood') }}" class="{{ $chipOff }}">2 · Makanan</a>
+            @else
+                <a id="chip-step-drink" href="{{ route('customer.checkoutDrink') }}" class="{{ $chipOff }}">1 · Minuman</a>
+                <span id="chip-step-sep" class="material-symbols-outlined text-base text-outline-variant">chevron_right</span>
+                <span id="chip-step-food" aria-current="step" class="{{ $chipOn }}">2 · Makanan</span>
+            @endif
+        </div>
+
     <!-- Order Summary Card -->
     <section class="card-soft p-gutter flex flex-col gap-unit-sm">
-        <h2 class="font-headline-sm text-headline-sm text-on-surface mb-2 tracking-tight">Ringkasan Pesanan</h2>
+        <h2 class="font-headline-sm text-headline-sm text-on-surface mb-2 tracking-tight">
+            {{ $isFoodStep ? 'Ringkasan Makanan' : 'Ringkasan Minuman' }}
+        </h2>
 
         <div id="checkout-items-list" class="flex flex-col gap-2.5 mb-2">
             <!-- Rendered by JS -->
@@ -27,81 +52,154 @@
 
         <hr class="divider-fine my-1"/>
 
-        <div class="flex justify-between items-center font-body-md text-body-md text-on-surface-variant py-0.5">
-            <span>Subtotal</span>
-            <span id="checkout-subtotal" class="text-on-surface">Rp0</span>
+        <div id="row-subtotal-drink" class="hidden">
+            <div class="flex justify-between items-center font-body-md text-body-md text-on-surface-variant py-0.5">
+                <span>Subtotal Minuman</span>
+                <span id="checkout-subtotal-drink" class="text-on-surface">Rp0</span>
+            </div>
         </div>
-        <div class="flex justify-between items-center font-body-md text-body-md text-on-surface-variant py-0.5">
-            <span>Pajak (PB1 10%)</span>
-            <span id="checkout-tax" class="text-on-surface">Rp0</span>
+        <div id="row-subtotal-food" class="hidden">
+            <div class="flex justify-between items-center font-body-md text-body-md text-on-surface-variant py-0.5">
+                <span>Subtotal Makanan</span>
+                <span id="checkout-subtotal-food" class="text-on-surface">Rp0</span>
+            </div>
         </div>
-        <hr class="divider-fine my-2"/>
-        <div class="flex justify-between items-center font-headline-sm text-headline-sm text-on-surface">
-            <span class="font-semibold">Total Bayar</span>
-            <span id="checkout-total" class="font-bold text-primary tracking-tight transition-colors duration-300">Rp0</span>
+
+        <p id="step1-hint" class="hidden text-[11px] text-on-surface-variant/70 font-medium leading-relaxed">
+            Total bayar dihitung di halaman Makanan setelah semua item diperiksa.
+        </p>
+
+        <hr id="divider-total" class="hidden divider-fine my-2"/>
+        <div id="row-tax" class="hidden">
+            <div class="flex justify-between items-center font-body-md text-body-md text-on-surface-variant py-0.5">
+                <span>Pajak (PB1 10%)</span>
+                <span id="checkout-tax" class="text-on-surface">Rp0</span>
+            </div>
+        </div>
+        <div id="row-total" class="hidden">
+            <div class="flex justify-between items-center font-headline-sm text-headline-sm text-on-surface">
+                <span class="font-semibold">Total Bayar</span>
+                <span id="checkout-total" class="font-bold text-primary tracking-tight transition-colors duration-300">Rp0</span>
+            </div>
         </div>
     </section>
 
-    <!-- Payment Method Card -->
-    <section class="card-soft p-gutter flex flex-col">
-        <div class="mb-4">
-            <h3 class="font-label-caps text-label-caps text-status-unpaid uppercase tracking-wider mb-1">Metode Pembayaran (Opsional)</h3>
-            <p class="font-body-secondary text-body-secondary text-on-surface-variant">Bayar tunai / QRIS langsung di kasir saat pesanan diverifikasi.</p>
-        </div>
+    <!-- Payment Method Card (final step only) -->
+    <div id="payment-card" class="hidden">
+        <section class="card-soft p-gutter flex flex-col">
+            <div class="mb-4">
+                <h3 class="font-label-caps text-label-caps text-status-unpaid uppercase tracking-wider mb-1">Metode Pembayaran (Opsional)</h3>
+                <p class="font-body-secondary text-body-secondary text-on-surface-variant">Bayar tunai / QRIS langsung di kasir saat pesanan diverifikasi.</p>
+            </div>
 
-        <!-- Payment Options -->
-        <div class="flex flex-col gap-2.5">
-            <!-- Option 1: Cash -->
-            <label class="payment-method-row flex items-center gap-3.5 p-4 cursor-pointer rounded-xl border border-on-surface/10 hover:border-primary/30 hover:bg-primary/5 transition-all duration-300">
-                <div class="radio-indicator w-5 h-5 rounded-full border-2 border-outline-variant flex items-center justify-center shrink-0 transition-colors"></div>
-                <input type="radio" name="payment_method" value="cash" class="hidden">
-                <span class="pay-icon flex items-center justify-center w-9 h-9 rounded-full bg-surface-container text-on-surface-variant shrink-0 transition-colors">
-                    <span class="material-symbols-outlined text-xl">payments</span>
-                </span>
-                <span class="font-body-md text-body-md text-on-surface flex-1">Bayar Tunai</span>
-            </label>
+            <!-- Payment Options -->
+            <div class="flex flex-col gap-2.5">
+                <!-- Option 1: Cash -->
+                <label class="payment-method-row flex items-center gap-3.5 p-4 cursor-pointer rounded-xl border border-on-surface/10 hover:border-primary/30 hover:bg-primary/5 transition-all duration-300">
+                    <div class="radio-indicator w-5 h-5 rounded-full border-2 border-outline-variant flex items-center justify-center shrink-0 transition-colors"></div>
+                    <input type="radio" name="payment_method" value="cash" class="hidden">
+                    <span class="pay-icon flex items-center justify-center w-9 h-9 rounded-full bg-surface-container text-on-surface-variant shrink-0 transition-colors">
+                        <span class="material-symbols-outlined text-xl">payments</span>
+                    </span>
+                    <span class="font-body-md text-body-md text-on-surface flex-1">Bayar Tunai</span>
+                </label>
 
-            <!-- Option 2: QRIS (Selected by default) -->
-            <label class="payment-method-row flex items-center gap-3.5 p-4 cursor-pointer rounded-xl border border-primary/40 bg-primary/5 hover:bg-primary/10 transition-all duration-300">
-                <div class="radio-indicator w-5 h-5 rounded-full border-[6px] border-primary flex items-center justify-center shrink-0 transition-colors"></div>
-                <input type="radio" name="payment_method" value="qris" checked class="hidden">
-                <span class="pay-icon flex items-center justify-center w-9 h-9 rounded-full bg-primary/15 text-primary shrink-0 transition-colors">
-                    <span class="material-symbols-outlined text-xl">qr_code</span>
-                </span>
-                <span class="font-body-md text-body-md text-on-surface font-semibold flex-1">QRIS</span>
-            </label>
-        </div>
-    </section>
+                <!-- Option 2: QRIS (Selected by default) -->
+                <label class="payment-method-row flex items-center gap-3.5 p-4 cursor-pointer rounded-xl border border-primary/40 bg-primary/5 hover:bg-primary/10 transition-all duration-300">
+                    <div class="radio-indicator w-5 h-5 rounded-full border-[6px] border-primary flex items-center justify-center shrink-0 transition-colors"></div>
+                    <input type="radio" name="payment_method" value="qris" checked class="hidden">
+                    <span class="pay-icon flex items-center justify-center w-9 h-9 rounded-full bg-primary/15 text-primary shrink-0 transition-colors">
+                        <span class="material-symbols-outlined text-xl">qr_code</span>
+                    </span>
+                    <span class="font-body-md text-body-md text-on-surface font-semibold flex-1">QRIS</span>
+                </label>
+            </div>
+        </section>
+    </div>
 </main>
 
 <!-- Fixed Bottom Action Bar -->
 <div class="fixed bottom-0 left-0 w-full p-margin-mobile bg-gradient-to-t from-background-warm via-background-warm/90 to-transparent dark:from-[#121212] dark:via-[#121212]/90 dark:to-transparent pb-8 pt-10 pointer-events-none z-40">
     <div class="max-w-2xl mx-auto w-full pointer-events-auto">
-        <button id="btn-submit-order" class="btn-cta w-full text-headline-sm h-[54px] flex items-center justify-center gap-2">
-            Buat Pesanan
-            <span class="material-symbols-outlined text-[20px]">arrow_forward</span>
-        </button>
+        <!-- Step 1 → lanjut ke halaman Makanan -->
+        <div id="bar-next" class="hidden">
+            <a id="btn-next-food" href="{{ route('customer.checkoutFood') }}"
+               class="btn-cta w-full text-headline-sm h-[54px] flex items-center justify-center gap-2">
+                Lanjut ke Makanan
+                <span class="material-symbols-outlined text-[20px]">arrow_forward</span>
+            </a>
+        </div>
+        <!-- Final step → buat pesanan -->
+        <div id="bar-submit" class="hidden">
+            <button id="btn-submit-order" class="btn-cta w-full text-headline-sm h-[54px] flex items-center justify-center gap-2">
+                Buat Pesanan
+                <span class="material-symbols-outlined text-[20px]">arrow_forward</span>
+            </button>
+        </div>
     </div>
 </div>
 
 @push('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', () => {
-        const cart = NordCart.getItems();
-        const itemsContainer = document.getElementById('checkout-items-list');
+        const PRODUCT_TYPES = @json($productTypes);
+        const STEP = @json($step);
+        const CART_URL = @json(route('customer.cart'));
+        const DRINK_URL = @json(route('customer.checkoutDrink'));
+        const FOOD_URL = @json(route('customer.checkoutFood'));
 
+        const cart = NordCart.getItems();
         if (!cart || cart.length === 0) {
-            window.location.href = "{{ route('customer.cart') }}";
+            window.location.href = CART_URL;
             return;
         }
 
-        let subtotal = 0;
+        /* Backfill carts saved before category_type existed, then persist. */
+        let patched = false;
+        cart.forEach(item => {
+            if (item.category_type !== 'minuman' && item.category_type !== 'makanan') {
+                item.category_type = PRODUCT_TYPES[String(item.product_id)] === 'minuman' ? 'minuman' : 'makanan';
+                patched = true;
+            }
+        });
+        if (patched) NordCart.saveItems(cart);
+
+        const drinks = cart.filter(i => i.category_type === 'minuman');
+        const foods  = cart.filter(i => i.category_type !== 'minuman');
+
+        const subtotalDrinks = drinks.reduce((s, i) => s + i.price * i.quantity, 0);
+        const subtotalFoods  = foods.reduce((s, i) => s + i.price * i.quantity, 0);
+        const subtotal = subtotalDrinks + subtotalFoods;
+        const tax = Math.round(subtotal * 0.10);
+        const total = subtotal + tax;
+        const fmt = n => `Rp${n.toLocaleString('id-ID')}`;
+
+        /* Single-group carts land directly on the right page. */
+        if (STEP === 'drink' && drinks.length === 0) { window.location.replace(FOOD_URL); return; }
+        if (STEP === 'food' && foods.length === 0) { window.location.replace(DRINK_URL); return; }
+
+        const show = id => document.getElementById(id)?.classList.remove('hidden');
+        const hide = id => document.getElementById(id)?.classList.add('hidden');
+
+        /* Stepper: hide chips for groups that are not in the cart. */
+        if (foods.length === 0) { hide('chip-step-food'); hide('chip-step-sep'); }
+        if (drinks.length === 0) { hide('chip-step-drink'); hide('chip-step-sep'); }
+
+        /* Back button for single-group carts → cart instead of the empty step. */
+        const back = document.getElementById('btn-back');
+        if (back && ((STEP === 'food' && drinks.length === 0) || (STEP === 'drink' && foods.length === 0))) {
+            back.href = CART_URL;
+        }
+
+        /* The last page (Makanan, or Minuman when there is no food) carries
+           payment + totals and submits the single combined order. */
+        const isFinal = STEP === 'food' || foods.length === 0;
+
+        /* Render items for this page */
+        const itemsContainer = document.getElementById('checkout-items-list');
         itemsContainer.innerHTML = '';
-
-        cart.forEach((item, index) => {
+        (STEP === 'food' ? foods : drinks).forEach((item, index) => {
             const itemTotal = item.price * item.quantity;
-            subtotal += itemTotal;
-
             const row = document.createElement('div');
             row.className = 'flex justify-between items-center gap-3 font-body-md text-body-md py-1 list-item-in';
             row.style.animationDelay = Math.min(index * 55, 300) + 'ms';
@@ -110,16 +208,36 @@
                     <span class="text-on-surface truncate">${item.name}</span>
                     <span class="shrink-0 px-1.5 py-0.5 rounded-md bg-surface-container text-on-surface-variant text-[11px] font-bold">${item.quantity}x</span>
                 </span>
-                <span class="text-on-surface font-semibold whitespace-nowrap">Rp${itemTotal.toLocaleString('id-ID')}</span>
+                <span class="text-on-surface font-semibold whitespace-nowrap">${fmt(itemTotal)}</span>
             `;
             itemsContainer.appendChild(row);
         });
 
-        const tax = Math.round(subtotal * 0.10);
-        const total = subtotal + tax;
-        document.getElementById('checkout-subtotal').textContent = `Rp${subtotal.toLocaleString('id-ID')}`;
-        document.getElementById('checkout-tax').textContent = `Rp${tax.toLocaleString('id-ID')}`;
-        document.getElementById('checkout-total').textContent = `Rp${total.toLocaleString('id-ID')}`;
+        /* Summary rows per step */
+        show('row-subtotal-drink');
+        if (isFinal && STEP === 'drink') {
+            document.getElementById('row-subtotal-drink').querySelector('span').textContent = 'Subtotal';
+        }
+        document.getElementById('checkout-subtotal-drink').textContent = fmt(subtotalDrinks);
+
+        if (STEP === 'food') {
+            show('row-subtotal-food');
+            document.getElementById('checkout-subtotal-food').textContent = fmt(subtotalFoods);
+        } else if (foods.length > 0) {
+            show('step1-hint');
+        }
+
+        if (isFinal) {
+            show('divider-total');
+            show('row-tax');
+            show('row-total');
+            document.getElementById('checkout-tax').textContent = fmt(tax);
+            document.getElementById('checkout-total').textContent = fmt(total);
+            show('payment-card');
+            show('bar-submit');
+        } else {
+            show('bar-next');
+        }
 
         // Radio toggle UI
         const rows = document.querySelectorAll('.payment-method-row');
@@ -148,10 +266,16 @@
             });
         });
 
-        // Submit Order
+        // Submit Order (single order with every item from both pages)
         document.getElementById('btn-submit-order').addEventListener('click', async () => {
+            const fullCart = NordCart.getItems();
+            if (!fullCart || fullCart.length === 0) {
+                window.location.href = CART_URL;
+                return;
+            }
+
             const selectedMethod = document.querySelector('input[name="payment_method"]:checked')?.value || 'qris';
-            
+
             const btn = document.getElementById('btn-submit-order');
             btn.disabled = true;
             btn.innerHTML = '<span class="material-symbols-outlined text-[20px] animate-spin">progress_activity</span> Membuat Pesanan...';
@@ -165,7 +289,7 @@
                         'X-CSRF-TOKEN': '{{ csrf_token() }}'
                     },
                     body: JSON.stringify({
-                        items: cart,
+                        items: fullCart,
                         payment_method: selectedMethod,
                         order_type: 'dine_in'
                     })

@@ -52,4 +52,14 @@ class User extends Authenticatable
     {
         return in_array($this->role ?? 'customer', ['admin', 'cashier'], true);
     }
+
+    public function hasKitchenAccess(): bool
+    {
+        return in_array($this->role ?? 'customer', ['admin', 'kitchen'], true);
+    }
+
+    public function isAdmin(): bool
+    {
+        return ($this->role ?? 'customer') === 'admin';
+    }
 }

@@ -35,9 +35,146 @@ class Order extends Model
         return $this->hasMany(OrderItem::class);
     }
 
+    public function itemsMinuman()
+    {
+        return $this->items()->where('department', OrderItem::DEPARTMENT_CASHIER);
+    }
+
+    public function itemsMakanan()
+    {
+        return $this->items()->where('department', OrderItem::DEPARTMENT_KITCHEN);
+    }
+
     public static function normalizeStatus(string $status): string
     {
         return $status === 'pending' ? 'unpaid' : $status;
+    }
+
+    /**
+     * Aggregate processing state for one department (Cashier / Kitchen).
+     * Returns null when the order holds no item for that department, which is
+     * how the operational screens avoid rendering empty work lists.
+     */
+    public function departmentStatus(string $department): ?string
+    {
+        $statuses = $this->items()
+            ->where('department', $department)
+            ->pluck('status');
+
+        if ($statuses->isEmpty()) {
+            return null;
+        }
+
+        if ($statuses->every(fn ($status) => $status === OrderItem::STATUS_COMPLETED)) {
+            return OrderItem::STATUS_COMPLETED;
+        }
+
+        $started = $statuses->contains(
+            fn ($status) => in_array($status, [OrderItem::STATUS_PREPARING, OrderItem::STATUS_COMPLETED], true)
+        );
+
+        return $started ? OrderItem::STATUS_PREPARING : OrderItem::STATUS_PENDING;
+    }
+
+    public function departmentStatusLabel(string $department): string
+    {
+        return match ($this->departmentStatus($department)) {
+            OrderItem::STATUS_PREPARING => 'Diproses',
+            OrderItem::STATUS_COMPLETED => 'Selesai',
+            OrderItem::STATUS_PENDING => 'Menunggu',
+            default => 'Tidak Ada Item',
+        };
+    }
+
+    public function departmentStatusBadgeClass(string $department): string
+    {
+        return match ($this->departmentStatus($department)) {
+            OrderItem::STATUS_PREPARING => 'pill-preparing',
+            OrderItem::STATUS_COMPLETED => 'pill-done',
+            default => 'pill-unpaid',
+        };
+    }
+
+    public function departmentSubtotal(string $department): float
+    {
+        return (float) $this->items()
+            ->where('department', $department)
+            ->sum('subtotal');
+    }
+
+    public function departmentItemCount(string $department): int
+    {
+        return (int) $this->items()
+            ->where('department', $department)
+            ->sum('quantity');
+    }
+
+    public function isPaymentSettled(): bool
+    {
+        return $this->payment_status === 'paid'
+            || in_array($this->status, ['paid', 'preparing', 'ready', 'completed'], true);
+    }
+
+    public function getPaymentStatusLabelAttribute(): string
+    {
+        return $this->isPaymentSettled() ? 'Sudah Dibayar' : 'Belum Dibayar';
+    }
+
+    public function getPaymentStatusBadgeClassAttribute(): string
+    {
+        return $this->isPaymentSettled() ? 'pill-paid' : 'pill-unpaid';
+    }
+
+    /**
+     * Recompute the order-level operational status from its items.
+     *
+     * Payment and processing are deliberately separate: items may be processed
+     * at any time, but the order only moves into preparing/completed once the
+     * payment is settled. Cancelled orders are never revived automatically.
+     */
+    public function syncStatusFromItems(): bool
+    {
+        if ($this->status === 'cancelled') {
+            return false;
+        }
+
+        $statuses = $this->items()->pluck('status');
+
+        if ($statuses->isEmpty() || ! $this->isPaymentSettled()) {
+            return false;
+        }
+
+        $allCompleted = $statuses->every(fn ($status) => $status === OrderItem::STATUS_COMPLETED);
+
+        if ($allCompleted) {
+            $newStatus = 'completed';
+        } else {
+            $started = $statuses->contains(
+                fn ($status) => in_array($status, [OrderItem::STATUS_PREPARING, OrderItem::STATUS_COMPLETED], true)
+            );
+            $newStatus = $started ? 'preparing' : 'paid';
+        }
+
+        // Never downgrade a legacy "ready" order back to merely paid.
+        if ($newStatus === 'paid' && $this->status === 'ready') {
+            return false;
+        }
+
+        if ($this->status === $newStatus) {
+            return false;
+        }
+
+        $this->status = $newStatus;
+        $this->save();
+
+        return true;
+    }
+
+    public function hasUnfinishedItems(): bool
+    {
+        return $this->items()
+            ->where('status', '!=', OrderItem::STATUS_COMPLETED)
+            ->exists();
     }
 
     public function isTerminal(): bool

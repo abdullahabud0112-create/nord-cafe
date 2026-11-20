@@ -597,24 +597,47 @@
 
 @php
     $isCashier = request()->routeIs('cashier.*');
+    $isKitchen = request()->routeIs('kitchen.*');
+    $isOperations = $isCashier || $isKitchen;
     $hideBottomNav = request()->routeIs('customer.productDetail')
-        || request()->routeIs('customer.checkout')
+        || request()->routeIs('customer.checkout*')
         || request()->routeIs('customer.ticket')
         || request()->routeIs('cashier.orderDetail')
-        || request()->routeIs('cashier.editStatus');
+        || request()->routeIs('cashier.editStatus')
+        || request()->routeIs('kitchen.show');
     $hideTopHeader = request()->routeIs('customer.productDetail')
         || request()->routeIs('customer.ticket')
         || request()->routeIs('cashier.orderDetail');
 @endphp
 
-<body class="bg-background-warm font-body-md text-on-surface antialiased flex flex-col min-h-screen relative {{ $isCashier ? 'cashier-layout' : '' }} {{ !$hideBottomNav ? 'pb-24' : '' }}">
+<body class="bg-background-warm font-body-md text-on-surface antialiased flex flex-col min-h-screen relative {{ $isOperations ? 'cashier-layout' : '' }} {{ !$hideBottomNav ? 'pb-24' : '' }}">
 
     {{-- Top AppBar Header (hidden on pages with custom header) --}}
     @unless($hideTopHeader)
     <header class="fixed top-0 left-0 right-0 z-40 bg-surface-container-lowest shadow-[0px_4px_12px_rgba(26,26,26,0.05)] w-full border-b border-on-surface/5">
         <div class="flex justify-between items-center w-full px-margin-mobile h-16 max-w-7xl mx-auto {{ $isCashier ? 'md:ml-64 md:max-w-none' : '' }}">
             
-            @if($isCashier)
+            @if($isKitchen)
+                <!-- Kitchen Brand Header -->
+                <a href="{{ route('kitchen.index') }}" class="flex items-center gap-3">
+                    <span class="material-symbols-outlined text-primary text-2xl" style="font-variation-settings: 'FILL' 1;">soup_kitchen</span>
+                    <h1 class="text-headline-md font-headline-md font-bold text-on-surface tracking-tight">NORD CAFE <span class="text-primary">DAPUR</span></h1>
+                </a>
+
+                <div class="flex items-center gap-3">
+                    <span class="hidden sm:flex items-center gap-1 text-xs font-medium text-status-unpaid">
+                        <span class="material-symbols-outlined text-sm">restaurant</span> Dapur
+                    </span>
+                    @if(auth()->check() && auth()->user()->isAdmin())
+                        <a href="{{ route('cashier.incomingOrders') }}" class="hidden sm:flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg border border-on-surface/10 hover:bg-surface-variant/20 text-on-surface transition-colors">
+                            <span class="material-symbols-outlined text-sm">point_of_sale</span> Kasir
+                        </a>
+                    @endif
+                    <div class="flex items-center justify-center w-9 h-9 rounded-full bg-surface-variant border border-on-surface/10 text-label-caps font-label-caps text-on-surface font-bold">
+                        D1
+                    </div>
+                </div>
+            @elseif($isCashier)
                 <!-- Cashier Brand Header -->
                 <a href="{{ route('cashier.incomingOrders') }}" class="flex items-center gap-3">
                     <span class="material-symbols-outlined text-primary text-2xl" style="font-variation-settings: 'FILL' 1;">point_of_sale</span>
@@ -625,6 +648,11 @@
                     <span class="hidden sm:flex items-center gap-1 text-xs font-medium text-status-unpaid">
                         <span class="material-symbols-outlined text-sm">badge</span> Kasir
                     </span>
+                    @if(auth()->check() && auth()->user()->isAdmin())
+                        <a href="{{ route('kitchen.index') }}" class="hidden sm:flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg border border-on-surface/10 hover:bg-surface-variant/20 text-on-surface transition-colors">
+                            <span class="material-symbols-outlined text-sm">soup_kitchen</span> Dapur
+                        </a>
+                    @endif
                     <a href="{{ route('cashier.menuManager') }}" class="hidden sm:flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg border border-on-surface/10 hover:bg-surface-variant/20 text-on-surface transition-colors">
                         <span class="material-symbols-outlined text-sm">restaurant_menu</span> Kelola Menu
                     </a>
@@ -700,11 +728,41 @@
             </a>
         </div>
     </aside>
+    @elseif($isKitchen)
+    @php
+        $sidebarKitchenActive = request()->routeIs('kitchen.index') && request('status') !== 'completed';
+        $sidebarKitchenHistoryActive = request('status') === 'completed';
+        $fillStyle = "font-variation-settings: 'FILL' 1;";
+    @endphp
+    <aside class="cashier-sidebar hidden flex-col w-64 bg-surface-container-lowest h-screen fixed left-0 top-0 border-r border-on-surface/5 pt-20 px-4 gap-1 z-30 shadow-[4px_0_12px_rgba(26,26,26,0.02)]">
+        <a href="{{ route('kitchen.index') }}"
+           class="flex items-center gap-3 px-4 py-3 rounded-xl transition-colors w-full text-left relative {{ $sidebarKitchenActive ? 'text-primary bg-primary/5 font-bold' : 'text-on-surface-variant hover:bg-surface-variant/20 font-semibold' }}">
+            @if($sidebarKitchenActive)<div class="absolute left-0 top-2 bottom-2 w-1 bg-primary rounded-r-md"></div>@endif
+            <span class="material-symbols-outlined" @if($sidebarKitchenActive) style="{{ $fillStyle }}" @endif>soup_kitchen</span>
+            <span class="font-body-md">Pesanan Dapur</span>
+        </a>
+        <a href="{{ route('kitchen.index', ['status' => 'completed']) }}"
+           class="flex items-center gap-3 px-4 py-3 rounded-xl transition-colors w-full text-left relative {{ $sidebarKitchenHistoryActive ? 'text-primary bg-primary/5 font-bold' : 'text-on-surface-variant hover:bg-surface-variant/20 font-semibold' }}">
+            @if($sidebarKitchenHistoryActive)<div class="absolute left-0 top-2 bottom-2 w-1 bg-primary rounded-r-md"></div>@endif
+            <span class="material-symbols-outlined" @if($sidebarKitchenHistoryActive) style="{{ $fillStyle }}" @endif>history</span>
+            <span class="font-body-md">Riwayat Dapur</span>
+        </a>
+
+        @if(auth()->check() && auth()->user()->isAdmin())
+        <div class="mt-4 border-t border-on-surface/5 pt-4">
+            <a href="{{ route('cashier.incomingOrders') }}"
+               class="flex items-center gap-3 px-4 py-3 rounded-xl transition-colors w-full text-left relative text-on-surface-variant hover:bg-surface-variant/20 font-semibold">
+                <span class="material-symbols-outlined">point_of_sale</span>
+                <span class="font-body-md">Kasir</span>
+            </a>
+        </div>
+        @endif
+    </aside>
     @endif
 
 
     <!-- Main Content Container -->
-    <main class="flex-grow {{ !$hideTopHeader ? 'pt-20' : '' }} px-margin-mobile max-w-7xl mx-auto w-full {{ $isCashier ? 'md:ml-64 md:max-w-none md:px-8' : '' }}">
+    <main class="flex-grow {{ !$hideTopHeader ? 'pt-20' : '' }} px-margin-mobile max-w-7xl mx-auto w-full {{ $isOperations ? 'md:ml-64 md:w-[calc(100%-16rem)] md:max-w-none md:px-8' : '' }}">
         @yield('content')
     </main>
 
@@ -718,9 +776,20 @@
         $navCatalogActive = request()->routeIs('customer.catalog');
         $navCartActive = request()->routeIs('customer.cart');
         $navStatusActive = request()->routeIs('customer.trackStatus');
+        $navKitchenActive = request()->routeIs('kitchen.index') && request('status') !== 'completed';
+        $navKitchenHistoryActive = request('status') === 'completed';
     @endphp
     <nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 py-3 pb-safe bg-surface-container-lowest border-t border-on-surface/10 rounded-t-xl shadow-[0px_-4px_12px_rgba(26,26,26,0.05)] md:hidden">
-        @if($isCashier)
+        @if($isKitchen)
+            <a href="{{ route('kitchen.index') }}" class="flex flex-col items-center justify-center {{ $navKitchenActive ? 'text-primary font-bold border-t-2 border-primary pt-1' : 'text-on-surface-variant opacity-60' }} text-label-caps font-label-caps w-28 transition-all">
+                <span class="material-symbols-outlined text-[24px] mb-1" @if($navKitchenActive) style="{{ $navFill }}" @endif>soup_kitchen</span>
+                <span>Pesanan Dapur</span>
+            </a>
+            <a href="{{ route('kitchen.index', ['status' => 'completed']) }}" class="flex flex-col items-center justify-center {{ $navKitchenHistoryActive ? 'text-primary font-bold border-t-2 border-primary pt-1' : 'text-on-surface-variant opacity-60' }} text-label-caps font-label-caps w-24 transition-all">
+                <span class="material-symbols-outlined text-[24px] mb-1" @if($navKitchenHistoryActive) style="{{ $navFill }}" @endif>history</span>
+                <span>Riwayat</span>
+            </a>
+        @elseif($isCashier)
             <a href="{{ route('cashier.scanBarcode') }}" class="flex flex-col items-center justify-center {{ $navScanActive ? 'text-primary font-bold border-t-2 border-primary pt-1' : 'text-on-surface-variant opacity-60' }} text-label-caps font-label-caps w-20 transition-all">
                 <span class="material-symbols-outlined text-[24px] mb-1" @if($navScanActive) style="{{ $navFill }}" @endif>qr_code_scanner</span>
                 <span>Pindai</span>
@@ -783,7 +852,10 @@
                         image_url: product.image_url,
                         quantity: quantity,
                         options: options,
-                        notes: notes
+                        notes: notes,
+                        /* 'minuman' | 'makanan' — drives the 2-page checkout split.
+                           Checkout also backfills older carts from a server map. */
+                        category_type: product.category_type || (product.category && product.category.type) || null
                     });
                 }
 
